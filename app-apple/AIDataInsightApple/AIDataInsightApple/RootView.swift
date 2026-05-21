@@ -94,18 +94,19 @@ struct RootView: View {
             }
             .frame(minWidth: 520, minHeight: 620)
         }
-        .sheet(isPresented: $showsLogoutConfirmation) {
-            LogoutConfirmationSheet(
-                isLoggingOut: environment.settingStore.state.isLoggingOut,
-                onCancel: {
-                    showsLogoutConfirmation = false
-                },
-                onConfirm: {
-                    Task {
-                        await environment.settingStore.logout()
-                    }
+        .confirmationDialog(
+            "退出后需要重新登录才能继续使用。",
+            isPresented: $showsLogoutConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button(environment.settingStore.state.isLoggingOut ? "退出中..." : "退出登录", role: .destructive) {
+                Task {
+                    await environment.settingStore.logout()
                 }
-            )
+            }
+            .disabled(environment.settingStore.state.isLoggingOut)
+
+            Button("取消", role: .cancel) {}
         }
     }
 
@@ -373,39 +374,6 @@ struct RootView: View {
 
 private enum RootRoute: Hashable {
     case privacy
-}
-
-private struct LogoutConfirmationSheet: View {
-    let isLoggingOut: Bool
-    let onCancel: () -> Void
-    let onConfirm: () -> Void
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 18) {
-            Text("退出登录")
-                .font(.headline)
-            Text("退出后需要重新登录才能继续使用。")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-
-            HStack {
-                Spacer()
-                Button("取消") {
-                    onCancel()
-                }
-                .keyboardShortcut(.cancelAction)
-
-                Button(isLoggingOut ? "退出中..." : "退出登录", role: .destructive) {
-                    onConfirm()
-                }
-                .keyboardShortcut(.defaultAction)
-                .disabled(isLoggingOut)
-                .accessibilityIdentifier("logout-confirm-button")
-            }
-        }
-        .padding(24)
-        .frame(width: 360)
-    }
 }
 
 private extension View {

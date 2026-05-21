@@ -313,6 +313,8 @@ public struct HistorySidebar: View {
             .padding(14)
 
             Divider()
+            
+            Spacer()
 
             List(selection: Binding(
                 get: { store.state.selectedID },

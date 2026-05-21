@@ -248,6 +248,27 @@ public struct SettingScreen: View {
                 .background(.bar)
                 .accessibilityElement(children: .contain)
                 .accessibilityIdentifier("setting-logout-area")
+                .confirmationDialog(
+                    store.state.logoutDialog.title,
+                    isPresented: Binding(
+                        get: { store.state.logoutDialog.visible },
+                        set: { visible in
+                            if visible == false {
+                                store.cancelLogout()
+                            }
+                        }
+                    ),
+                    titleVisibility: .visible
+                ) {
+                    Button(store.state.logoutDialog.confirmTitle, role: .destructive) {
+                        Task {
+                            await store.logout()
+                        }
+                    }
+                    Button(store.state.logoutDialog.cancelTitle, role: .cancel) {
+                        store.cancelLogout()
+                    }
+                }
             }
         }
         .background(AppColor.Background.secondary.color)
@@ -258,27 +279,6 @@ public struct SettingScreen: View {
 #endif
         .task {
             await store.load()
-        }
-        .confirmationDialog(
-            store.state.logoutDialog.title,
-            isPresented: Binding(
-                get: { store.state.logoutDialog.visible },
-                set: { visible in
-                    if visible == false {
-                        store.cancelLogout()
-                    }
-                }
-            ),
-            titleVisibility: .visible
-        ) {
-            Button(store.state.logoutDialog.confirmTitle, role: .destructive) {
-                Task {
-                    await store.logout()
-                }
-            }
-            Button(store.state.logoutDialog.cancelTitle, role: .cancel) {
-                store.cancelLogout()
-            }
         }
     }
 

@@ -1,6 +1,6 @@
 {
   "generator": "scripts/generate-cross-platform-contracts.rb",
-  "sourceHash": "7eb32bddfe015f185c707248d22954cb7c33043e7da12ba2448caf1792c7b1c2",
+  "sourceHash": "28c057f50c4492e2715535565dba654bdd7cb082caddde2b8c3535d671410123",
   "outputs": [
     "app-android/core/model/src/main/java/com/aidatainsight/android/core/model/contract/ContractModels.kt",
     "app-web/src/contracts/generated/models.ts",
@@ -10,6 +10,10 @@
     {
       "path": "docs/cross-platform/contracts/api/openapi.yaml",
       "sha256": "719a1dc4910c0abf2edb1b1cadeac0e91697482a97b2862017fb61f3438077eb"
+    },
+    {
+      "path": "docs/cross-platform/contracts/contract-manifest.yaml",
+      "sha256": "ce3496e2bb7c6beac1c62e4940666dcb81c15e834645a1a1751e4c583b3c0299"
     },
     {
       "path": "docs/cross-platform/contracts/design/tokens.json",
@@ -156,6 +160,14 @@
       "sha256": "310315c044180ccb60087c59bbf0a03988d33781569e988fd4a471f479b5dcd3"
     },
     {
+      "path": "docs/cross-platform/contracts/migrations/0.2.0-account-user-protected-persistence.yaml",
+      "sha256": "15c7ca46019607bdddbb9abec9c4929bff354ac1c71806cb76367df23fe76931"
+    },
+    {
+      "path": "docs/cross-platform/contracts/migrations/0.2.1-ai-home-history-interaction-polish.yaml",
+      "sha256": "43d69e54a8624c02e1f4a53dee4d6df024f557ff3621d3070416c665747f36c2"
+    },
+    {
       "path": "docs/cross-platform/contracts/routes/route-intents.yaml",
       "sha256": "7d7a8d8e1daceb73935efebfe357ceff98290d6f6655633ce4883ec820ed650f"
     },
@@ -165,11 +177,11 @@
     },
     {
       "path": "docs/cross-platform/contracts/ui-layout/ai-home-layout.yaml",
-      "sha256": "9efab6b4ad216cd7c23e649c9e7b517d2b46452e222d14817ca52a47ff16527f"
+      "sha256": "4bc544747b8e55a5878b89ff2dc55972a5f55e0acb0a3633963e6a7e36904d90"
     },
     {
       "path": "docs/cross-platform/contracts/ui-layout/history-layout.yaml",
-      "sha256": "d05612b20c1f327e6c24dbcefbd5afafdd01f67f891af033de4f36c8882cbc20"
+      "sha256": "4691cd14989a83b57bde6ae0bb165f9c2b9c2ae06015008243ce901c1e623c92"
     },
     {
       "path": "docs/cross-platform/contracts/ui-layout/login-layout.yaml",
@@ -185,7 +197,7 @@
     },
     {
       "path": "docs/cross-platform/contracts/ui-state/ai-home-state.yaml",
-      "sha256": "5ed7a3ccdccce585b06794fcdd1904c2e8d54ada9acbe4e05656d98e05a110e2"
+      "sha256": "9ee43c8309ec049012687c71a959ae8f541e301690e465beb2e286e60baeee43"
     },
     {
       "path": "docs/cross-platform/contracts/ui-state/history-state.yaml",
@@ -209,7 +221,7 @@
     },
     {
       "path": "docs/cross-platform/contracts/usecases/ai-home.usecases.yaml",
-      "sha256": "0a89a612b6b7da241f6c4bc2eef95b83cd7d339aa0435d8af2e4400d40ebe673"
+      "sha256": "f86cf647bbb8220b6887fe0fa8c5af42912745c15b0d752c3b2236bf2a216159"
     },
     {
       "path": "docs/cross-platform/contracts/usecases/history.usecases.yaml",
@@ -217,7 +229,7 @@
     },
     {
       "path": "docs/cross-platform/contracts/usecases/setting.usecases.yaml",
-      "sha256": "29868340197ba4b0fa3ce609c9752c4fd00633c4942c08ed4763f87911222ffa"
+      "sha256": "4c336d6e109f94310ad24e0c4d99402b4e0ae903175ad87464c7e1d9cf92e553"
     }
   ]
 }

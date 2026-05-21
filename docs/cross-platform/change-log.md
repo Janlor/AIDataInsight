@@ -23,6 +23,26 @@ scripts/check-contract-alignment.sh <app>
 
 ## Recent Records
 
+### 0.2.1 - AIHome / History Interaction Polish
+
+- Migration: `docs/cross-platform/contracts/migrations/0.2.1-ai-home-history-interaction-polish.yaml`
+- Manifest: `docs/cross-platform/contracts/contract-manifest.yaml`
+- Status:
+  - `app-ios`: pending-review
+  - `app-apple`: aligned
+  - `app-android`: pending-review
+  - `app-harmony`: pending-review
+  - `app-web`: pending-review
+
+核心规则摘要：
+
+- 空的新会话状态下，`New Chat` 必须呈现不可用状态。
+- Chat 标题可使用当前历史会话标题；空新会话回退到模块标题。
+- History 行默认不常驻删除按钮，删除通过长按、上下文菜单、右键或平台 secondary action 暴露。
+- History 的 Settings 入口可放在顶部或底部账号/更多区域；如果是整行入口，空白区域也必须可点击。
+- 从 History 打开 Settings 时应保留合理返回上下文；抽屉/overlay 实现可在 Settings 后保留 History。
+- compact History 抽屉使用横向意图和 normalized progress；全聊天面拖拽只有在能可靠避免纵向滚动/点击冲突时才启用。
+
 ### 0.2.0 - AccountUser Protected Persistence
 
 - Migration: `docs/cross-platform/contracts/migrations/0.2.0-account-user-protected-persistence.yaml`

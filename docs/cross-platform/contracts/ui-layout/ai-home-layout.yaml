@@ -1,4 +1,4 @@
-version: 0.1.0
+version: 0.2.1
 feature: ai-home
 sourceState: docs/cross-platform/contracts/ui-state/ai-home-state.yaml
 purpose: >
@@ -27,6 +27,10 @@ surfaces:
   main:
     id: chat
     title: "AI数据分析助手"
+    titlePolicy:
+      emptyNewConversation: "AI数据分析助手"
+      activeConversation: useHistoryConversationTitleWhenAvailable
+      fallback: "AI数据分析助手"
     owns:
       - AIChat message list
       - AIChat input composer
@@ -65,12 +69,19 @@ navigationControls:
       iconSemantic: settings
       action: openSettings
       enabledWhen: canOpenSettings
+    footer:
+      id: openSettingsFromAccountArea
+      iconSemantic: moreVertical
+      action: openSettings
+      enabledWhen: canOpenSettings
+      hitTarget: fullRow
 
 panelBehavior:
   history:
     openTriggers:
       - navigationControls.chat.leading
       - horizontalDragFromLeadingEdge
+      - horizontalDragFromChatSurfaceWhenPlatformCanDisambiguate
     closeTriggers:
       - selectHistoryConversation
       - horizontalDragTowardLeadingEdge
@@ -93,7 +104,8 @@ panelBehavior:
       openGesture:
         - Allow drag-open from the leading screen edge when the history panel is fully closed.
         - Leading-edge drag target width should be 24 density-independent pixels in compact overlay mode.
-        - Allow drag-open from the chat surface when the gesture clearly starts at the leading edge.
+        - Allow drag-open from the chat surface when horizontal intent is clear and the implementation can avoid conflicting with vertical scroll.
+        - If full-surface drag conflicts with chat scrolling or tapping, prefer leading-edge drag until the platform has reliable gesture arbitration.
       closeGesture:
         - Allow drag-close by dragging the visible history panel toward the leading edge.
         - Continue tracking the same normalized panel progress during drag-open and drag-close.
@@ -120,6 +132,10 @@ panelBehavior:
       - The history panel must slide according to drawer progress instead of appearing/disappearing instantly.
       - Safe-area padding belongs to panel content, not to the panel container or overlay scrim.
       - The visible background behind the status bar should be the same history/grouped-page background used by the panel body, not a default white/black system or component color.
+    settingsPolicy:
+      - Opening Settings from History should preserve an intuitive return context.
+      - Overlay/drawer implementations may keep History visible behind Settings, so dismissing Settings returns to the History panel.
+      - Persistent split-pane implementations may open Settings without changing History visibility.
 
 layoutModes:
   compact:
@@ -164,12 +180,15 @@ contentRules:
     - Initial AIHome loads AIChat with selectedHistoryId null, so AIChat loads template questions.
     - When selectedHistoryId is not null, AIChat loads history detail for that id.
     - New conversation clears messages, clears selectedHistoryId, disables the new conversation action until the user sends or loads a conversation, and reloads templates.
+    - Chat title displays the current conversation title when available; otherwise it displays the module title.
     - Message list must stay scrollable when keyboard appears.
     - Streaming state must not be lost when opening/closing the history panel.
   history:
     - History panel shows grouped records from HistoryUiState.
     - Empty and error states are displayed inside the history surface, not as global app errors.
-    - Long press or secondary action may expose delete action.
+    - Long press, context menu, right click, or platform secondary action may expose delete action.
+    - Inline delete buttons are hidden by default; use explicit edit mode only if the platform convention requires it.
+    - Settings entry may live in the top bar or footer/account area. If rendered as a row, the whole row must respond to activation, including whitespace between label and icon.
     - Deleting the active conversation resets chat to a new conversation.
     - Settings action routes to routeIntent.openSettings.
 

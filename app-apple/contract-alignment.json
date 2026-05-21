@@ -1,11 +1,12 @@
 {
   "app": "app-apple",
-  "contractVersion": "0.2.0",
-  "lastAppliedMigration": "0.2.0-account-user-protected-persistence",
+  "contractVersion": "0.2.1",
+  "lastAppliedMigration": "0.2.1-ai-home-history-interaction-polish",
   "status": "aligned",
-  "updatedAt": "2026-05-20",
+  "updatedAt": "2026-05-21",
   "notes": [
     "KeychainAccountUserStore persists AccountUser.",
-    "Setting renders cached user info before remote refresh."
+    "Setting renders cached user info before remote refresh.",
+    "AIHome New Chat disabled state, chat title policy, compact History drawer behavior, History Settings return context, and secondary-delete History rows are aligned with 0.2.1."
   ]
 }

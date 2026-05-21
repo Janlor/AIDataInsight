@@ -1,4 +1,4 @@
-version: 0.1.0
+version: 0.2.1
 feature: ai-home
 sourceReferences:
   ios:
@@ -92,6 +92,8 @@ usecases:
       - Keep activePanel unchanged unless the platform command explicitly closes it.
       - Emit chatCommand startNewConversation so the chat feature clears current messages and reloads template questions.
       - New conversation action is disabled while chat is sending or streaming.
+      - New conversation action is also disabled when selectedHistoryId is null, chat has no messages, and chat input is blank.
+      - New conversation action becomes available again after the user types non-blank draft text, sends a message, or loads a history conversation.
 
   - name: HandleHistoryMutationUseCase
     input:

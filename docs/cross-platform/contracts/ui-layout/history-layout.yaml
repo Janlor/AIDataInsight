@@ -1,4 +1,4 @@
-version: 0.1.0
+version: 0.2.1
 feature: history
 
 layoutIntent:
@@ -10,10 +10,25 @@ layoutIntent:
 structure:
   navigationBar:
     title: "历史会话"
+    titlePolicy:
+      standalone: "历史会话"
+      embeddedInAIHomeMayUseModuleTitle: "AI数据分析助手"
+      displayMode: inlineOrPlatformDefault
     trailingAction:
       semantic: settings
       behavior: routeIntent.openSettings
       icon: optionalPlatformNativeIcon
+      visibility: optionalWhenFooterSettingsEntryExists
+    closeAction:
+      visibility: optionalPlatformChrome
+      notes: Overlay panels may rely on outside tap, back gesture, or drag-close instead of a visible close button.
+  footer:
+    settingsEntry:
+      semantic: accountOrMore
+      behavior: routeIntent.openSettings
+      icon: moreVertical
+      hitTarget: fullRow
+      visibility: optionalPlatformPreferred
   content:
     scrollable: true
     readableWidth: true
@@ -44,14 +59,21 @@ rowRules:
     action: openHistory(historyId)
   delete:
     trigger: longPressOrSecondaryAction
+    pointerTrigger: contextMenuOrRightClick
     menuTitle: "删除"
     inlineButtonVisible: false
 
 topBarRules:
-  - Title must be "历史会话", not "历史记录".
-  - The current reference UI exposes settings in the top bar.
+  - Standalone History title must be "历史会话", not "历史记录".
+  - Embedded AIHome drawer implementations may show the module title "AI数据分析助手" in the local panel chrome when the surrounding shell already communicates History through navigation controls.
+  - The current reference UI may expose settings in the top bar or footer/account area according to platform conventions.
   - Refresh and clear-all are not visible top-level buttons in the current reference UI.
   - If the target platform has no matching settings icon, use a text command such as "设置"; do not use fake text icons.
+
+footerRules:
+  - If the footer/account area opens Settings, the full row including whitespace must be clickable.
+  - A more-vertical icon may indicate additional account/settings affordances.
+  - Opening Settings from a History overlay should preserve an intuitive return context; dismissing Settings may return to the still-open History panel.
 
 loadingRules:
   - Initial empty load may show a centered loading indicator.

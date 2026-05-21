@@ -1,4 +1,4 @@
-version: 0.1.0
+version: 0.2.1
 feature: ai-home
 state:
   name: AIHomeUiState
@@ -55,6 +55,8 @@ rules:
   - Opening history sets shouldRefreshHistoryWhenPanelOpens to true for one UI cycle.
   - Selecting a history conversation sets selectedHistoryId, closes the history panel, and commands AIChat to load that conversation.
   - Starting a new conversation clears selectedHistoryId and commands AIChat to clear current messages then load template questions.
+  - canStartNewConversation is false when selectedHistoryId is null, chatState.messages is empty, chatState.inputText is blank, and chat is not sending or streaming.
+  - canStartNewConversation becomes true after loading a history conversation, adding a message, or entering non-blank draft text.
   - Deleting the selected history conversation or deleting all history resets chat to a new conversation.
   - Deleting a history conversation that is not selected must not reset chat.
 

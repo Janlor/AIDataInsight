@@ -1,0 +1,75 @@
+id: 0.2.1-ai-home-history-interaction-polish
+version: 0.2.1
+date: "2026-05-21"
+title: AI Home and History interaction polish
+breaking: false
+category:
+  - ai-home
+  - ai-chat
+  - history
+  - ui-layout
+
+context: >
+  Apple 全平台实现进入可用收尾阶段后，暴露出一些可复用于多端的交互细节：
+  新会话按钮需要明确禁用态，History 不应把删除按钮常驻在每一行，
+  非触屏平台必须仍可通过 secondary action 删除，Settings 从 History 进入时应按平台保留合理返回上下文。
+
+contractChanges:
+  - New conversation action is disabled when the current chat is already an empty new conversation.
+  - AI Chat title may use the active conversation title after a history conversation is loaded; empty new conversation keeps the module title.
+  - History rows expose delete through long press, context menu, right click, or platform secondary action; inline delete buttons remain hidden by default.
+  - History Settings entry may live in a footer/account area instead of a top bar when that matches platform navigation patterns; the whole entry row must be clickable.
+  - Opening Settings from a History overlay may preserve the History panel behind the settings route so dismissing Settings returns to History.
+  - Compact History drawer gestures use horizontal intent and normalized progress; implementations may allow full chat-surface drag-open when they can avoid vertical scroll conflicts.
+
+requiredClientActions:
+  app-ios:
+    status: pending-review
+    actions:
+      - Verify New Chat disabled state for empty new conversations.
+      - Verify history row delete is exposed through long press or contextual action, not a persistent inline button.
+      - Verify Settings entry placement and return context match platform norms.
+  app-apple:
+    status: implemented
+    actions:
+      - Disable New Chat when chat is already empty/new.
+      - Use conversation title for active chat and module title for new chat.
+      - Hide inline history delete buttons and expose delete through context menu/secondary click.
+      - Use a footer/account Settings entry whose full row is clickable.
+      - Keep compact History visible behind Settings when Settings is opened from History.
+  app-android:
+    status: pending-review
+    actions:
+      - Verify New Chat disabled state for empty new conversations.
+      - Verify history row delete uses long press or overflow/context action.
+      - Verify drawer gestures and Settings return context match Material/navigation patterns.
+  app-harmony:
+    status: pending-review
+    actions:
+      - Verify New Chat disabled state for empty new conversations.
+      - Verify history row delete uses long press or context menu.
+      - Verify drawer gestures and Settings return context match HarmonyOS patterns.
+  app-web:
+    status: pending-review
+    actions:
+      - Verify New Chat disabled state for empty new conversations.
+      - Verify history row delete uses secondary/context action and remains available for pointer devices.
+      - Verify drawer gestures and Settings return context match responsive web patterns.
+
+recommendedReadSet:
+  - docs/ai-entrypoint.md
+  - docs/cross-platform/contracts/contract-manifest.yaml
+  - docs/cross-platform/contracts/migrations/0.2.1-ai-home-history-interaction-polish.yaml
+  - docs/cross-platform/contracts/ui-state/ai-home-state.yaml
+  - docs/cross-platform/contracts/ui-layout/ai-home-layout.yaml
+  - docs/cross-platform/contracts/ui-layout/history-layout.yaml
+  - docs/cross-platform/contracts/usecases/ai-home.usecases.yaml
+  - "{app}/contract-alignment.json"
+
+acceptance:
+  - Empty new chat shows New Chat as disabled or otherwise visibly unavailable.
+  - Loading or sending a conversation enables New Chat again.
+  - History rows have no always-visible inline delete button by default.
+  - Touch and pointer platforms both expose a discoverable delete action through platform secondary interaction.
+  - Opening Settings from History preserves an intuitive return context.
+  - Contract alignment check reports the target app as aligned after implementation.

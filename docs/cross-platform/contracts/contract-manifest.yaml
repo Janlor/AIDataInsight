@@ -1,7 +1,7 @@
 schemaVersion: 1
 contractPackage: AIDataInsight Cross-Platform Contracts
-contractVersion: 0.2.0
-updatedAt: "2026-05-20"
+contractVersion: 0.2.1
+updatedAt: "2026-05-21"
 status: active
 summary: >
   Source-of-truth contract package for AIDataInsight domain models, OpenAPI,
@@ -44,6 +44,16 @@ currentMigrations:
   - id: 0.2.0-account-user-protected-persistence
     version: 0.2.0
     file: docs/cross-platform/contracts/migrations/0.2.0-account-user-protected-persistence.yaml
+    breaking: false
+    requiredFor:
+      - app-ios
+      - app-android
+      - app-harmony
+      - app-web
+      - app-apple
+  - id: 0.2.1-ai-home-history-interaction-polish
+    version: 0.2.1
+    file: docs/cross-platform/contracts/migrations/0.2.1-ai-home-history-interaction-polish.yaml
     breaking: false
     requiredFor:
       - app-ios

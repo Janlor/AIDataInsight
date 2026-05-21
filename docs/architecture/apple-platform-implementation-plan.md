@@ -55,6 +55,39 @@
 - 用 SwiftUI、Observation、SwiftData、Swift Testing 展示现代 Apple 项目的推荐实践。
 - 在 iPhone、iPadOS、macOS、visionOS 上共享业务能力，但让 presentation shell 尊重各平台体验。
 
+## 当前收尾状态
+
+截至 2026-05-21，`app-apple` 已经从实施计划进入可使用状态，跨平台契约标注为 `0.2.1` 已对齐。
+
+已完成：
+
+- SwiftUI package-first 工程、App 入口、Root composition、Feature/Core packages。
+- 登录、自动登录、隐私协议、设置、退出登录与 Keychain-backed session / user storage。
+- AI Chat 模板问题、新对话、历史会话恢复、`/chat/function` function analysis、业务图表接口分发、SwiftUI 图表渲染、反馈。
+- 推荐问题交互与其他端保持 welcome 卡片语义，不直接替换首屏上下文。
+- iPhone compact 聊天气泡、底部输入区、左侧历史抽屉和紧凑导航。
+- iPadOS / macOS regular 分栏工作台。
+- 历史列表分组、分页、选择恢复、上下文菜单删除；macOS 补齐右键菜单删除。
+- macOS 设置入口采用系统菜单 / commands 语义，移动端设置继续使用页面或 sheet。
+- New Chat 按钮在当前已是空白新对话时进入不可交互状态。
+- 跨平台契约新增 `0.2.1-ai-home-history-interaction-polish` migration，并在 `app-apple/contract-alignment.json` 标注已应用。
+
+已验证：
+
+- `scripts/validate-cross-platform-contracts.sh`
+- `scripts/generate-cross-platform-contracts.sh`
+- `scripts/check-contract-alignment.sh app-apple`
+- `xcodebuild -scheme AIDataInsightApple -destination generic/platform=iOS build`
+- `xcodebuild -scheme AIDataInsightApple -destination platform=macOS build`
+- `FeatureAIChat` / `FeatureHistory` 等核心 package 的 `swift test`
+
+仍建议后续继续跟进：
+
+- iPhone 聊天页全屏横向抽屉手势与内部纵向滚动、点击事件的完全互斥。
+- visionOS 真机或模拟器 smoke build 与视觉验证。
+- 更完整的 XCTest UI Tests、截图回归、Dynamic Type 和辅助功能验证。
+- 生产环境配置、错误空态、弱网与刷新 token 的更完整端到端验证。
+
 ## 官方技术依据
 
 Apple 官方文档：
@@ -564,7 +597,7 @@ SwiftData 用途：
 
 - 单栏。
 - Chat first。
-- History 通过 navigation destination 或 sheet 打开。
+- compact width 下 History 使用左侧抽屉，通过按钮或横向手势打开。
 - 输入区键盘避让稳定。
 - 适配 Dynamic Type。
 
@@ -584,7 +617,7 @@ SwiftData 用途：
 
 - 原生 SwiftUI macOS window。
 - toolbar。
-- menu commands。
+- menu commands，设置入口优先放入系统菜单语义。
 - keyboard shortcuts。
 - context menu。
 - hover state。
@@ -609,6 +642,8 @@ SwiftData 用途：
 - 不依赖 hover-only 操作。
 
 ## 实施阶段
+
+下面阶段记录的是原始实施拆解。当前 `app-apple` 已完成阶段 0 到阶段 7 的可用版本落地；后续工作以测试扩展、视觉打磨和平台 smoke 为主。
 
 ### 阶段 0：工程准备
 

@@ -4,7 +4,7 @@ AIDataInsight 是一个 AI 驱动的数据分析多端应用项目。
 
 项目的核心目标不是“手写多套互相漂移的端侧代码”，而是先设计一套稳定的领域模型、API 契约、业务用例和设计规则，再让 AI 基于这套契约辅助生成 iOS、Android、HarmonyOS NEXT、Web 以及未来候选端实现。
 
-当前 iOS、Android、HarmonyOS NEXT 和 Web 已完成主要功能开发，并逐步沉淀为参考实现、契约验收端、ArkUI 原生实现端和桌面工作台实现端；macOS、Windows 等端暂作为后续候选方向评估。
+当前 iOS、Android、HarmonyOS NEXT、Web 和现代 Apple 全平台实现已完成主要功能开发，并逐步沉淀为参考实现、契约验收端、ArkUI 原生实现端、桌面工作台实现端和 SwiftUI 多平台参考实现；Windows 暂作为后续候选方向评估。
 
 ## 项目理念
 
@@ -36,7 +36,7 @@ P0 iOS：已完成主要功能，继续稳定和契约化
 P1 Android：已完成主要功能，继续作为契约验收端
 P2 HarmonyOS NEXT：已完成主要功能开发，后续以 bugfix 和体验优化为主
 P3 Web：已完成主要功能开发，进入收尾、联调和体验打磨
-P4 macOS：短期靠 iPadOS 兼容模式，SwiftUI 化后再看
+P4 Apple 全平台：现代 SwiftUI app-apple 已可用，作为 iOS / iPadOS / macOS / visionOS 参考实现继续打磨
 P5 Windows：暂不规划，未来优先 Web / PWA
 ```
 
@@ -159,11 +159,29 @@ AIDataInsight
 各端 README 负责说明本端工程结构、运行方式和实现细节：
 
 - iOS 端说明：[app-ios/README.md](app-ios/README.md)
+- Apple 全平台说明：[app-apple/README.md](app-apple/README.md)
 - Android 端说明：[app-android/README.md](app-android/README.md)
 - HarmonyOS NEXT 端说明：[app-harmony/README.md](app-harmony/README.md)
 - Web 端说明：[app-web/README.md](app-web/README.md)
 
 iOS 端是当前最完整的参考实现。iOS 专属架构设计、Networking 定稿和组件依赖关系图已经移到 [app-ios/docs](app-ios/docs)，根 README 不再重复展开这些端侧细节。
+
+## Apple 全平台当前状态
+
+`app-apple` 是基于跨平台契约重新实现的现代 SwiftUI 多平台工程，不复用 UIKit `app-ios` 的页面、Router 或 Cell 代码。它当前已进入可用收尾状态，并与契约 `0.2.1` 对齐。
+
+当前已完成：
+
+- iOS 17+、iPadOS 17+、macOS 14+、visionOS 1.0+ 的 SwiftUI package-first 工程
+- Login / 自动登录 / Privacy / Setting / logout 链路
+- AccountSession 与 AccountUser 的 Keychain 持久化，Setting 先读本地缓存再刷新远端
+- AIChat 模板问题、`/chat/function`、动态 chart endpoint、图表渲染、反馈状态和历史详情回放
+- iPhone compact 历史抽屉，iPadOS / macOS regular split workspace
+- History 分组、分页、选择恢复 Chat、长按 / 上下文菜单 / 右键删除
+- iPhone 紧凑聊天气泡与输入框体验、macOS 菜单入口和设置页承载策略
+- Swift Testing 包测试和 Xcode build 验证
+
+Apple 全平台说明见 [app-apple/README.md](app-apple/README.md)，实现计划与收尾记录见 [docs/architecture/apple-platform-implementation-plan.md](docs/architecture/apple-platform-implementation-plan.md)。
 
 ## Android 当前状态
 
@@ -247,7 +265,7 @@ Web 端说明见 [app-web/README.md](app-web/README.md)。
 
 ## 桌面端
 
-macOS 当前可以通过 iPadOS 兼容模式运行 iOS App。未来如果 UIKit 逐步迁移 SwiftUI，可再评估 macOS 原生 target。
+macOS 原生体验当前优先由 `app-apple` 承担。Web 继续作为跨平台桌面工作台和 E2E 回归端。
 
 Windows 暂不规划。如果未来确实需要桌面端，优先考虑 Web / PWA / Tauri / Electron。
 
@@ -309,6 +327,8 @@ AI 生成端侧代码时必须遵守固定协议：
 
 - iOS 端说明：[app-ios/README.md](app-ios/README.md)
 - iOS 专属文档：[app-ios/docs](app-ios/docs)
+- Apple 全平台说明：[app-apple/README.md](app-apple/README.md)
+- Apple 全平台实现计划：[docs/architecture/apple-platform-implementation-plan.md](docs/architecture/apple-platform-implementation-plan.md)
 - 多端适配建议：[docs/architecture/platform-adaptation-strategy.md](docs/architecture/platform-adaptation-strategy.md)
 - HarmonyOS NEXT 适配清单：[docs/architecture/harmonyos-next-implementation-plan.md](docs/architecture/harmonyos-next-implementation-plan.md)
 - Web 执行计划：[docs/architecture/web-implementation-plan.md](docs/architecture/web-implementation-plan.md)
@@ -326,6 +346,6 @@ AI 生成端侧代码时必须遵守固定协议：
 
 - 当前仓库以 AI 数据分析 Demo、多端架构设计和契约驱动生成实践为主
 - iOS 已经具备完整参考实现
-- iOS / Android / HarmonyOS NEXT / Web 已完成主要功能开发，后续以联调、bugfix 和体验打磨为主
+- iOS / Android / HarmonyOS NEXT / Web / app-apple 已完成主要功能开发，后续以联调、bugfix 和体验打磨为主
 - 当前默认环境使用 Apifox mock；Web E2E 使用 local mock 保持稳定回归
-- macOS、Windows 暂不作为当前阶段强目标
+- macOS 由 app-apple 原生支持；Windows 暂不作为当前阶段强目标

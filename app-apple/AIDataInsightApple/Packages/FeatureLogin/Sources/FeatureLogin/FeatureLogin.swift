@@ -230,6 +230,7 @@ public struct LoginScreen: View {
             .font(.system(size: 16, weight: .bold))
             .foregroundStyle(AppColor.Label.primary.color)
             .textFieldStyle(.plain)
+            .multilineTextAlignment(.center)
             .disabled(store.state.isLoading)
             .frame(height: 45)
             .accessibilityIdentifier(accessibilityID)

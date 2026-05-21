@@ -447,10 +447,12 @@ public struct AIChatScreen: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @FocusState private var isComposerFocused: Bool
     @Bindable private var store: AIChatStore
+    private let account: AccountDisplayState
     private let bottomAnchorID = "chat-bottom-anchor"
 
-    public init(store: AIChatStore) {
+    public init(store: AIChatStore, account: AccountDisplayState = .placeholder) {
         self.store = store
+        self.account = account
     }
 
     public var body: some View {
@@ -554,8 +556,8 @@ public struct AIChatScreen: View {
                         .font(.system(size: sendButtonIconSize, weight: .semibold))
                         .foregroundStyle(.white)
                         .frame(width: sendButtonSide, height: sendButtonSide)
-                        .background(sendButtonBackground, in: Circle())
-                        .contentShape(Circle())
+                        .background(sendButtonBackground, in: sendButtonShape)
+                        .contentShape(sendButtonShape)
                 }
                 .help("发送")
                 .disabled(canSendMessage == false)
@@ -685,7 +687,7 @@ public struct AIChatScreen: View {
             .frame(maxWidth: 680, alignment: message.role == .user ? .trailing : .leading)
 
             if message.role == .user {
-                avatar(systemName: "person.fill", color: .secondary)
+                AccountInitialsAvatar(account: account, size: 28)
             } else {
                 Spacer(minLength: 80)
             }
@@ -880,6 +882,14 @@ public struct AIChatScreen: View {
         14
 #else
         18
+#endif
+    }
+
+    private var sendButtonShape: some InsettableShape {
+#if os(macOS)
+        RoundedRectangle(cornerRadius: 8)
+#else
+        Circle()
 #endif
     }
 

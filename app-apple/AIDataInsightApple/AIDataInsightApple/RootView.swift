@@ -51,6 +51,12 @@ struct RootView: View {
         .task {
             await environment.loginStore.resolveLaunchSession()
         }
+        .task(id: environment.loginStore.state.isAuthenticated) {
+            guard environment.loginStore.state.isAuthenticated else {
+                return
+            }
+            await environment.settingStore.load()
+        }
         .onReceive(NotificationCenter.default.publisher(for: .startNewChat)) { _ in
             environment.historyStore.clearSelection()
             environment.chatStore.startNewChat()
@@ -113,6 +119,7 @@ struct RootView: View {
                 NavigationSplitView {
                     HistorySidebar(
                         store: environment.historyStore,
+                        account: accountDisplay,
                         onNewChat: {
                             environment.chatStore.startNewChat()
                         },
@@ -139,7 +146,7 @@ struct RootView: View {
                         }
                     )
                 } detail: {
-                    AIChatScreen(store: environment.chatStore)
+                    AIChatScreen(store: environment.chatStore, account: accountDisplay)
                         .toolbar {
                             ToolbarItem {
                                 Button("New Chat", systemImage: "square.and.pencil") {
@@ -165,7 +172,7 @@ struct RootView: View {
 
             ZStack(alignment: .leading) {
                 NavigationStack {
-                    AIChatScreen(store: environment.chatStore)
+                    AIChatScreen(store: environment.chatStore, account: accountDisplay)
                         .toolbar {
 #if !os(macOS)
                             ToolbarItem(placement: .navigationBarLeading) {
@@ -218,6 +225,7 @@ struct RootView: View {
         NavigationStack {
             HistorySidebar(
                 store: environment.historyStore,
+                account: accountDisplay,
                 onNewChat: {
                     environment.historyStore.clearSelection()
                     environment.chatStore.startNewChat()
@@ -306,6 +314,17 @@ struct RootView: View {
         environment.chatStore.state.activeHistoryID != nil
         || environment.chatStore.state.messages.isEmpty == false
         || environment.chatStore.state.draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
+    }
+
+    private var accountDisplay: AccountDisplayState {
+        let rows = environment.settingStore.state.sections.flatMap(\.rows)
+        let nickname = rows.first(where: { $0.kind == .nickname })?.detail.nonEmptyAccountField
+        let username = rows.first(where: { $0.kind == .username })?.detail.nonEmptyAccountField
+        let phone = rows.first(where: { $0.kind == .phone })?.detail.nonEmptyAccountField
+        return AccountDisplayState(
+            displayName: nickname ?? username ?? phone ?? "用户",
+            secondaryText: username ?? phone
+        )
     }
 
     private func startNewChat() {
@@ -397,5 +416,17 @@ private extension View {
 #else
         self
 #endif
+    }
+}
+
+private extension Optional where Wrapped == String {
+    var nonEmptyAccountField: String? {
+        guard let value = self?.trimmingCharacters(in: .whitespacesAndNewlines),
+              value.isEmpty == false,
+              value != "未设置"
+        else {
+            return nil
+        }
+        return value
     }
 }

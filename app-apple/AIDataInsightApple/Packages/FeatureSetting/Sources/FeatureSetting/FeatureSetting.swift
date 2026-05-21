@@ -302,21 +302,19 @@ public struct SettingScreen: View {
 
     private var accountHeader: some View {
         HStack(spacing: 14) {
-            Text("JL")
-                .font(.title3.bold())
-                .foregroundStyle(.white)
-                .frame(width: 52, height: 52)
-                .background(AppColor.Accent.primary.color, in: Circle())
+            AccountInitialsAvatar(account: accountDisplay, size: 52)
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(accountDisplayName)
+                Text(accountDisplay.displayName)
                     .font(.title3.weight(.semibold))
                     .foregroundStyle(AppColor.Label.primary.color)
                     .lineLimit(1)
-                Text("Demo Workspace")
-                    .font(.subheadline)
-                    .foregroundStyle(AppColor.Label.secondary.color)
-                    .lineLimit(1)
+                if let secondaryText = accountDisplay.secondaryText {
+                    Text(secondaryText)
+                        .font(.subheadline)
+                        .foregroundStyle(AppColor.Label.secondary.color)
+                        .lineLimit(1)
+                }
             }
             Spacer()
         }
@@ -328,11 +326,15 @@ public struct SettingScreen: View {
         }
     }
 
-    private var accountDisplayName: String {
-        store.state.sections
-            .flatMap(\.rows)
-            .first(where: { $0.kind == .nickname })?
-            .detail ?? "Janlor Lee"
+    private var accountDisplay: AccountDisplayState {
+        let rows = store.state.sections.flatMap(\.rows)
+        let nickname = rows.first(where: { $0.kind == .nickname })?.detail.nonEmptyAccountField
+        let username = rows.first(where: { $0.kind == .username })?.detail.nonEmptyAccountField
+        let phone = rows.first(where: { $0.kind == .phone })?.detail.nonEmptyAccountField
+        return AccountDisplayState(
+            displayName: nickname ?? username ?? phone ?? "用户",
+            secondaryText: username ?? phone
+        )
     }
 
     private func sectionCard(_ section: SettingSectionState) -> some View {
@@ -422,6 +424,16 @@ public struct SettingScreen: View {
 private extension String? {
     var nonEmpty: String? {
         guard let value = self, value.isEmpty == false else {
+            return nil
+        }
+        return value
+    }
+
+    var nonEmptyAccountField: String? {
+        guard let value = self?.trimmingCharacters(in: .whitespacesAndNewlines),
+              value.isEmpty == false,
+              value != "未设置"
+        else {
             return nil
         }
         return value

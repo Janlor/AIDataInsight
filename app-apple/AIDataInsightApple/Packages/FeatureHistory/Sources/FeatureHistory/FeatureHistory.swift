@@ -268,6 +268,7 @@ public struct HistorySidebar: View {
     @Bindable private var store: HistoryStore
     @State private var hoveredConversationID: Int?
     private let showsTitle: Bool
+    private let account: AccountDisplayState
     private let onNewChat: () -> Void
     private let onSelect: (Int) -> Void
     private let onDeletedSelected: () -> Void
@@ -278,6 +279,7 @@ public struct HistorySidebar: View {
     public init(
         store: HistoryStore,
         showsTitle: Bool = true,
+        account: AccountDisplayState = .placeholder,
         onNewChat: @escaping () -> Void = {},
         onSelect: @escaping (Int) -> Void = { _ in },
         onDeletedSelected: @escaping () -> Void = {},
@@ -287,6 +289,7 @@ public struct HistorySidebar: View {
     ) {
         self.store = store
         self.showsTitle = showsTitle
+        self.account = account
         self.onNewChat = onNewChat
         self.onSelect = onSelect
         self.onDeletedSelected = onDeletedSelected
@@ -386,17 +389,15 @@ public struct HistorySidebar: View {
 
     private var accountLabel: some View {
         HStack(spacing: 10) {
-            Text("JL")
-                .font(.caption.bold())
-                .foregroundStyle(.white)
-                .frame(width: 30, height: 30)
-                .background(.blue, in: Circle())
+            AccountInitialsAvatar(account: account, size: 30)
             VStack(alignment: .leading, spacing: 2) {
-                Text("Janlor Lee")
+                Text(account.displayName)
                     .font(.subheadline)
-                Text("Demo Workspace")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                if let secondaryText = account.secondaryText {
+                    Text(secondaryText)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             }
         }
     }

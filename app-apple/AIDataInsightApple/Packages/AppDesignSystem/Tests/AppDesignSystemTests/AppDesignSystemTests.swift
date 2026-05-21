@@ -15,3 +15,15 @@ import Testing
 @Test func chartPaletteOrderMatchesContractToken() {
     #expect(AppChartPalette.order == ["blue", "cyan", "mint", "green", "purple", "orange", "coral"])
 }
+
+@Test func accountDisplayInitialsUseNicknameWords() {
+    let account = AccountDisplayState(displayName: "Janlor Lee", secondaryText: "janlor")
+    #expect(account.initials == "JL")
+    #expect(account.secondaryText == "janlor")
+}
+
+@Test func accountDisplayInitialsHandleCompactNames() {
+    let account = AccountDisplayState(displayName: "演示账号", secondaryText: "演示账号")
+    #expect(account.initials == "演示")
+    #expect(account.secondaryText == nil)
+}

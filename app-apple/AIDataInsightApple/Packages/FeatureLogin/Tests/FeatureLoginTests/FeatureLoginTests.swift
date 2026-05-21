@@ -16,6 +16,21 @@ import AppContracts
 }
 
 @MainActor
+@Test func loginStateMatchesContractDefaultsAndLimitsInputLength() {
+    let store = LoginStore()
+
+    #expect(store.state.account == "demo")
+    #expect(store.state.password == "demo@123")
+    #expect(store.state.acceptedPrivacy)
+
+    store.updateAccount(String(repeating: "a", count: 40))
+    store.updatePassword(String(repeating: "b", count: 40))
+
+    #expect(store.state.account.count == 30)
+    #expect(store.state.password.count == 30)
+}
+
+@MainActor
 @Test func loginStoreTracksLaunchSessionResolution() async {
     let store = LoginStore(accountService: StaticAccountService(session: AccountSession(
         accessToken: "token",

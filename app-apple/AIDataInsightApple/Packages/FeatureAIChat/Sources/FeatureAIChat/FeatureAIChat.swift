@@ -6,9 +6,6 @@ import Charts
 import Foundation
 import Observation
 import SwiftUI
-#if os(macOS)
-import AppKit
-#endif
 
 public enum AIChatIntentType: String, Equatable, Sendable {
     case time
@@ -460,7 +457,7 @@ public struct AIChatScreen: View {
             content
             composer
         }
-        .background(Color(nsColorCompatibleLight: "#F7F8FA", dark: "#0B1020"))
+        .background(chatBackground)
         .navigationTitle(store.state.displayTitle)
 #if !os(macOS)
         .navigationBarTitleDisplayMode(.inline)
@@ -492,7 +489,7 @@ public struct AIChatScreen: View {
                             ProgressView()
                                 .controlSize(.small)
                             Text("分析中...")
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(AppColor.Label.secondary.color)
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                     }
@@ -530,7 +527,7 @@ public struct AIChatScreen: View {
             if let errorMessage = store.state.errorMessage {
                 Text(errorMessage)
                     .font(.footnote)
-                    .foregroundStyle(.red)
+                    .foregroundStyle(AppColor.Status.mark.color)
                     .frame(maxWidth: 860, alignment: .leading)
             }
 
@@ -580,17 +577,17 @@ public struct AIChatScreen: View {
     private var welcomeBubble: some View {
         HStack(alignment: .top, spacing: 12) {
             if usesCompactMessageLayout == false {
-                avatar(systemName: "sparkles", color: .blue)
+                avatar(systemName: "sparkles", color: AppColor.Accent.primary.color)
             }
             VStack(alignment: .leading, spacing: 16) {
                 Text("你好，我是你的AI数据分析助手。我能根据业绩、库存、代采、应收、帐龄等领域的问题生成相应的智能图表。")
                     .font(.body)
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(AppColor.Label.primary.color)
 
                 VStack(alignment: .leading, spacing: 8) {
                     Text("你也可以尝试点击以下推荐问题：")
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(AppColor.Label.secondary.color)
                     if store.state.isLoadingTemplate {
                         ProgressView()
                             .controlSize(.small)
@@ -607,7 +604,7 @@ public struct AIChatScreen: View {
                                     Spacer(minLength: 8)
                                     Image(systemName: "arrow.up.right")
                                         .font(.caption)
-                                        .foregroundStyle(.secondary)
+                                        .foregroundStyle(AppColor.Label.secondary.color)
                                 }
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(.vertical, 9)
@@ -630,10 +627,10 @@ public struct AIChatScreen: View {
                 }
             }
             .padding(16)
-            .background(Color(nsColorCompatibleLight: "#FFFFFF", dark: "#151D30"), in: UnevenRoundedRectangle(topLeadingRadius: 21, bottomLeadingRadius: 4, bottomTrailingRadius: 21, topTrailingRadius: 21))
+            .background(AppColor.GroupedBackground.secondary.elevatedColor, in: UnevenRoundedRectangle(topLeadingRadius: 21, bottomLeadingRadius: 4, bottomTrailingRadius: 21, topTrailingRadius: 21))
             .overlay {
                 UnevenRoundedRectangle(topLeadingRadius: 21, bottomLeadingRadius: 4, bottomTrailingRadius: 21, topTrailingRadius: 21)
-                    .stroke(Color.secondary.opacity(0.16))
+                    .stroke(AppColor.Separator.default.color)
             }
             .frame(maxWidth: usesCompactMessageLayout ? .infinity : nil, alignment: .leading)
             if usesCompactMessageLayout == false {
@@ -651,13 +648,13 @@ public struct AIChatScreen: View {
                 .minimumScaleFactor(0.8)
             Text(caption)
                 .font(.caption2)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(AppColor.Label.secondary.color)
                 .lineLimit(1)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 8)
         .padding(.horizontal, 6)
-        .background(Color.blue.opacity(0.08), in: RoundedRectangle(cornerRadius: 8))
+        .background(AppColor.Accent.secondary.color, in: RoundedRectangle(cornerRadius: 8))
     }
 
     @ViewBuilder
@@ -672,7 +669,7 @@ public struct AIChatScreen: View {
     private func regularMessageView(_ message: ChatMessageViewState) -> some View {
         HStack(alignment: .top, spacing: 12) {
             if message.role == .assistant {
-                avatar(systemName: "sparkles", color: .blue)
+                avatar(systemName: "sparkles", color: AppColor.Accent.primary.color)
             } else {
                 Spacer(minLength: 80)
             }
@@ -682,7 +679,7 @@ public struct AIChatScreen: View {
             .background(messageBackground(for: message), in: RoundedRectangle(cornerRadius: 8))
             .overlay {
                 RoundedRectangle(cornerRadius: 8)
-                    .stroke(Color.secondary.opacity(message.role == .user ? 0.05 : 0.16))
+                    .stroke(messageBorder(for: message))
             }
             .frame(maxWidth: 680, alignment: message.role == .user ? .trailing : .leading)
 
@@ -704,7 +701,7 @@ public struct AIChatScreen: View {
             .background(messageBackground(for: message), in: RoundedRectangle(cornerRadius: 14))
             .overlay {
                 RoundedRectangle(cornerRadius: 14)
-                    .stroke(Color.secondary.opacity(message.role == .user ? 0.04 : 0.14))
+                    .stroke(messageBorder(for: message))
             }
             .accessibilityIdentifier("chat-message-\(message.id)")
     }
@@ -712,7 +709,7 @@ public struct AIChatScreen: View {
     private func messageBubble(_ message: ChatMessageViewState) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(message.text)
-                .foregroundStyle(.primary)
+                .foregroundStyle(AppColor.Label.primary.color)
                 .textSelection(.enabled)
 
             if let chartPayload = message.chartPayload {
@@ -726,7 +723,11 @@ public struct AIChatScreen: View {
     }
 
     private func messageBackground(for message: ChatMessageViewState) -> Color {
-        message.role == .user ? Color.blue.opacity(0.12) : Color(nsColorCompatibleLight: "#FFFFFF", dark: "#151D30")
+        message.role == .user ? AppColor.Accent.secondary.color : AppColor.GroupedBackground.secondary.elevatedColor
+    }
+
+    private func messageBorder(for message: ChatMessageViewState) -> Color {
+        message.role == .user ? AppColor.Accent.primary.color.opacity(0.10) : AppColor.Separator.default.color
     }
 
     private func feedbackToolbar(for message: ChatMessageViewState) -> some View {
@@ -750,7 +751,7 @@ public struct AIChatScreen: View {
         Button(action: action) {
             Image(systemName: isSelected ? selectedSystemName : systemName)
                 .frame(width: 28, height: 28)
-                .foregroundStyle(isSelected ? Color.blue : Color.secondary)
+                .foregroundStyle(isSelected ? AppColor.Accent.primary.color : AppColor.Label.secondary.color)
         }
         .buttonStyle(.plain)
         .help(help)
@@ -764,13 +765,13 @@ public struct AIChatScreen: View {
                 Spacer()
                 Text(payload.unitLabel)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(AppColor.Label.secondary.color)
             }
 
             if payload.series.isEmpty {
                 Text(payload.emptyMessage ?? "数据分析还在测试阶段，很快就能上线，敬请期待！")
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(AppColor.Label.secondary.color)
             } else {
                 let rows = chartRows(for: payload)
                 Chart(rows) { row in
@@ -814,7 +815,7 @@ public struct AIChatScreen: View {
                                 .lineLimit(1)
                             Spacer()
                             Text(row.scaledValue.formatted(.number.precision(.fractionLength(0...2))))
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(AppColor.Label.secondary.color)
                         }
                     }
                 }
@@ -823,7 +824,7 @@ public struct AIChatScreen: View {
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.blue.opacity(0.06), in: RoundedRectangle(cornerRadius: 8))
+        .background(AppColor.GroupedBackground.tertiary.color, in: RoundedRectangle(cornerRadius: 8))
     }
 
     private func chartRows(for payload: ChartPayloadViewState) -> [ChartRowViewState] {
@@ -866,7 +867,18 @@ public struct AIChatScreen: View {
     }
 
     private var sendButtonBackground: Color {
-        canSendMessage ? .blue : Color.secondary.opacity(0.24)
+        canSendMessage ? AppColor.Accent.primary.color : AppColor.Label.quaternary.color.opacity(0.35)
+    }
+
+    private var chatBackground: some View {
+        LinearGradient(
+            colors: [
+                AppColor.GroupedBackground.primary.color,
+                AppColor.Background.primary.color,
+            ],
+            startPoint: .top,
+            endPoint: .bottom
+        )
     }
 
     private var sendButtonSide: CGFloat {
@@ -906,35 +918,21 @@ public struct AIChatScreen: View {
     }
 }
 
-private extension Color {
-    init(nsColorCompatibleLight lightHex: String, dark darkHex: String) {
-#if os(macOS)
-        self.init(nsColor: NSColor(name: nil) { appearance in
-            appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
-                ? NSColor(Color(hex: darkHex))
-                : NSColor(Color(hex: lightHex))
-        })
-#else
-        self.init(hex: lightHex)
-#endif
-    }
-}
-
 private struct ComposerContainerStyle: ViewModifier {
     func body(content: Content) -> some View {
 #if os(macOS)
         let shape = RoundedRectangle(cornerRadius: 10, style: .continuous)
         content
-            .background(Color(nsColorCompatibleLight: "#FFFFFF", dark: "#151D30"), in: shape)
+            .background(AppColor.GroupedBackground.secondary.elevatedColor, in: shape)
             .overlay {
-                shape.stroke(Color.secondary.opacity(0.20))
+                shape.stroke(AppColor.Separator.default.color)
             }
 #else
         let shape = RoundedRectangle(cornerRadius: 28, style: .continuous)
         content
-            .background(Color(nsColorCompatibleLight: "#FFFFFF", dark: "#151D30"), in: shape)
+            .background(AppColor.GroupedBackground.secondary.elevatedColor, in: shape)
             .overlay {
-                shape.stroke(Color.secondary.opacity(0.20))
+                shape.stroke(AppColor.Separator.default.color)
             }
 #endif
     }

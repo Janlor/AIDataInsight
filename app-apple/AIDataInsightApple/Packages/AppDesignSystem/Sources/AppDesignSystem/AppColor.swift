@@ -19,6 +19,10 @@ public struct AppColorToken: Equatable, Sendable {
     public var color: Color {
         Color(light: Color(hex: lightHex), dark: Color(hex: darkHex))
     }
+
+    public var elevatedColor: Color {
+        Color(light: Color(hex: lightHex), dark: Color(hex: elevatedHex ?? darkHex))
+    }
 }
 
 public enum AppColor {
@@ -33,10 +37,18 @@ public enum AppColor {
         public static let tertiary = AppColorToken(lightHex: "#FFFFFF", darkHex: "#202B42", elevatedHex: "#2A3652")
     }
 
+    public enum GroupedBackground {
+        public static let primary = AppColorToken(lightHex: "#F4F7FB", darkHex: "#0B1020", elevatedHex: "#131A2A")
+        public static let secondary = AppColorToken(lightHex: "#FFFFFF", darkHex: "#151D30", elevatedHex: "#1B2438")
+        public static let tertiary = AppColorToken(lightHex: "#EEF3FA", darkHex: "#202B42", elevatedHex: "#2A3652")
+    }
+
     public enum Label {
         public static let primary = AppColorToken(lightHex: "#111827", darkHex: "#F9FAFB")
         public static let secondary = AppColorToken(lightHex: "#5B6475", darkHex: "#B8C2D9")
         public static let tertiary = AppColorToken(lightHex: "#8A94A6", darkHex: "#8F9BB3")
+        public static let quaternary = AppColorToken(lightHex: "#B2BAC8", darkHex: "#657089")
+        public static let quinary = AppColorToken(lightHex: "#D1D5DB", darkHex: "#4B5568")
     }
 
     public enum Separator {

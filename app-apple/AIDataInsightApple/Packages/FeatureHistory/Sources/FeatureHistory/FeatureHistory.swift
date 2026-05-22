@@ -334,10 +334,12 @@ public struct HistorySidebar: View {
             )) {
                 if store.state.isLoading, store.conversations.isEmpty {
                     ProgressView()
+                        .listRowBackground(AppColor.GroupedBackground.primary.color)
                 }
 
                 if let errorMessage = store.state.errorMessage {
                     errorRow(errorMessage)
+                        .listRowBackground(AppColor.GroupedBackground.primary.color)
                 }
 
                 ForEach(store.state.groups) { group in
@@ -346,6 +348,7 @@ public struct HistorySidebar: View {
                             row(conversation)
                                 .tag(conversation.remoteID)
                                 .listRowInsets(EdgeInsets(top: 3, leading: 8, bottom: 3, trailing: 8))
+                                .listRowBackground(AppColor.GroupedBackground.primary.color)
 #if os(macOS)
                                 .contextMenu {
                                     deleteMenuItem(for: conversation)
@@ -361,6 +364,8 @@ public struct HistorySidebar: View {
                 }
             }
             .listStyle(.sidebar)
+            .scrollContentBackground(.hidden)
+            .background(AppColor.GroupedBackground.primary.color)
             .refreshable {
                 await store.loadFirstPage()
             }
@@ -375,7 +380,7 @@ public struct HistorySidebar: View {
                     Spacer()
                     Image(systemName: "ellipsis")
                         .rotationEffect(.degrees(90))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(AppColor.Label.secondary.color)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .contentShape(Rectangle())
@@ -386,7 +391,7 @@ public struct HistorySidebar: View {
         }
         .navigationTitle(navigationTitle)
         .navigationSplitViewColumnWidth(min: 260, ideal: 300, max: 360)
-        .background(AppColor.Background.secondary.color)
+        .background(AppColor.GroupedBackground.primary.color)
         .accessibilityIdentifier("history-sidebar")
         .task {
             if store.conversations.isEmpty {
@@ -404,7 +409,7 @@ public struct HistorySidebar: View {
                 if let secondaryText = account.secondaryText {
                     Text(secondaryText)
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(AppColor.Label.secondary.color)
                 }
             }
         }
@@ -422,7 +427,7 @@ public struct HistorySidebar: View {
         VStack(alignment: .leading, spacing: 8) {
             Text(message)
                 .font(.footnote)
-                .foregroundStyle(.red)
+                .foregroundStyle(AppColor.Status.mark.color)
 
             Button {
                 Task {
@@ -450,7 +455,7 @@ public struct HistorySidebar: View {
                 if conversation.displayTime.isEmpty == false {
                     Text(conversation.displayTime)
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(AppColor.Label.secondary.color)
                 }
             }
             Spacer()
@@ -471,7 +476,7 @@ public struct HistorySidebar: View {
                     .fill(AppColor.Accent.primary.color.opacity(0.14))
             } else if isHovered {
                 RoundedRectangle(cornerRadius: 8)
-                    .fill(AppColor.Background.tertiary.color)
+                    .fill(AppColor.GroupedBackground.tertiary.color)
             }
         }
         .onHover { isHovering in

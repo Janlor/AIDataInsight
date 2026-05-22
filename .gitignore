@@ -99,5 +99,13 @@ app-web/.env*.local
 app-web/test-results/
 app-web/playwright-report/
 
+# API server
+api-server/.venv/
+api-server/.pytest_cache/
+api-server/__pycache__/
+api-server/**/__pycache__/
+api-server/data/*.db
+api-server/data/*.db-*
+
 # Interview
 interview

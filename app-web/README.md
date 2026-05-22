@@ -39,14 +39,14 @@ pnpm e2e
 
 ## 环境配置
 
-默认不配置环境变量时，Web 端使用跨平台契约里的 Apifox mock host。
+默认不配置环境变量时，Web 端使用本地 `api-server`。
 
 环境由 `NEXT_PUBLIC_APP_ENV` 和 `NEXT_PUBLIC_API_BASE_URL` 控制：
 
 | 环境 | 用途 | 默认 base URL |
 | --- | --- | --- |
-| `mock` | 默认开发联调，使用 Apifox mock | `https://m1.apifoxmock.com/m1/3174267-1700689-default` |
-| `local` | 本地离线开发、E2E 稳定测试 | `http://localhost:3000/api/mock` |
+| `local` | 默认本地开发，使用独立 `api-server` | `http://127.0.0.1:3000` |
+| `mock` | Apifox mock 回退环境 | `https://m1.apifoxmock.com/m1/3174267-1700689-default` |
 | `dev` | 真实 DEV 后端 | 必须显式配置 |
 | `test` / `sit` / `uat` | 测试环境 | 必须显式配置 |
 | `pre` | 预发环境 | 必须显式配置 |
@@ -55,8 +55,8 @@ pnpm e2e
 常用启动方式：
 
 ```sh
+pnpm dev:local  # standalone api-server
 pnpm dev:mock   # Apifox mock
-pnpm dev:local  # local Next.js mock route
 ```
 
 也可以复制对应示例文件为 `.env.local`：
@@ -72,9 +72,17 @@ cp .env.prod.example .env.local
 
 `dev/test/sit/uat/pre/prod` 如果没有配置 `NEXT_PUBLIC_API_BASE_URL`，启动或构建时会直接报错，避免误打默认 mock。
 
-## 本地 Mock API
+## 本地后端与 Mock API
 
-本地 mock API 只作为离线开发和 E2E 的稳定夹具，不替代 Apifox mock。
+使用 `local` 环境前，需要先启动仓库根目录的 `api-server`：
+
+```sh
+cd ../api-server
+source .venv/bin/activate
+uvicorn app.main:app --host 127.0.0.1 --port 3000 --reload
+```
+
+Web 内置的 Next.js mock API 仍保留给 Playwright E2E 作为稳定夹具，不替代独立 `api-server`。
 
 它覆盖了第一阶段主链路：
 

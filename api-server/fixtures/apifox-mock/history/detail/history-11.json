@@ -1,0 +1,48 @@
+{
+    "code": 200,
+    "msg": "OK",
+    "data": {
+        "id": 11,
+        "name": "查询公司FHJK大额应收账款客户。",
+        "createId": 1,
+        "updateId": 1,
+        "createName": "演示账号",
+        "updateName": "演示账号",
+        "createTime": "2024-11-11 22:18:50",
+        "updateTime": "2024-11-11 22:19:05",
+        "detailList": [
+            {
+                "id": 64,
+                "historyId": 11,
+                "type": "1",
+                "contentType": "1",
+                "content": "列出公司FHJK应收余额超过5000万的客户。",
+                "isLike": null,
+                "createTime": "2024-11-11 22:18:50",
+                "updateTime": "2024-11-11 22:18:50"
+            },
+            {
+                "id": 66,
+                "historyId": 11,
+                "type": "2",
+                "contentType": "2",
+                "content": "{\"defaultType\":\"1\",\"funcType\":\"queryArGroupByCustomer\",\"historyDetailId\":null,\"chartCommonVoList\":[{\"bizId\":null,\"name\":\"HRDL有限公司\",\"value\":58605095.000000000000000},{\"bizId\":null,\"name\":\"北京GHHK股份有限公司\",\"value\":80588312.460000000000000},{\"bizId\":null,\"name\":\"山西FYVC有限责任公司\",\"value\":336609322.660000000000000},{\"bizId\":null,\"name\":\"河北FGVC有限公司\",\"value\":64640675.000000000000000},{\"bizId\":null,\"name\":\"吉林FFCV股份有限公司\",\"value\":56442041.610000000000000},{\"bizId\":null,\"name\":\"陕西DXCC有限责任公司\",\"value\":65661720.000000000000000}],\"accountAgeGroupVoList\":null,\"msg\":null,\"chartType\":null}",
+                "isLike": null,
+                "createTime": "2024-11-11 22:18:58",
+                "updateTime": "2024-11-11 22:18:58"
+            },
+            {
+                "id": 68,
+                "historyId": 11,
+                "type": "1",
+                "contentType": "1",
+                "content": "钢材存货金额余额最多的公司？",
+                "isLike": null,
+                "createTime": "2024-11-11 22:19:05",
+                "updateTime": "2024-11-11 22:19:05"
+            }
+        ]
+    },
+    "trace": "aa8776634b8e41b6883f43d0bc71f70d.30443.17768488225370059",
+    "tid": "efa84795-23d7-4ea6-bdfa-972a26e0bab7"
+}

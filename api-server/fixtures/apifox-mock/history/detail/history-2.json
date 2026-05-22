@@ -1,0 +1,98 @@
+{
+    "code": 200,
+    "msg": "OK",
+    "data": {
+        "id": 2,
+        "name": "三季度销售额超2亿公司有哪些？",
+        "createId": 1,
+        "updateId": 1,
+        "createName": "演示账号",
+        "updateName": "演示账号",
+        "createTime": "2024-11-11 21:47:58",
+        "updateTime": "2024-11-11 21:48:55",
+        "detailList": [
+            {
+                "id": 9,
+                "historyId": 2,
+                "type": "1",
+                "contentType": "1",
+                "content": "今年第三季度销售额大于2亿的公司有哪些？",
+                "isLike": null,
+                "createTime": "2024-11-11 21:47:58",
+                "updateTime": "2024-11-11 21:47:58"
+            },
+            {
+                "id": 10,
+                "historyId": 2,
+                "type": "2",
+                "contentType": "2",
+                "content": "{\"defaultType\":\"1\",\"funcType\":\"querySalesGroupByOrgAndGoodsType\",\"historyDetailId\":null,\"chartCommonVoList\":[{\"bizId\":null,\"name\":\"公司GHKP\",\"value\":243299922.160000000000000},{\"bizId\":null,\"name\":\"公司FHJK\",\"value\":635547913.900000000000000},{\"bizId\":null,\"name\":\"公司FHLC\",\"value\":1414903041.120000000000000}],\"accountAgeGroupVoList\":null,\"msg\":null,\"chartType\":null}",
+                "isLike": null,
+                "createTime": "2024-11-11 21:48:03",
+                "updateTime": "2024-11-11 21:48:03"
+            },
+            {
+                "id": 11,
+                "historyId": 2,
+                "type": "1",
+                "contentType": "1",
+                "content": "查看仓库中煤炭库存大于5万吨的公司。",
+                "isLike": null,
+                "createTime": "2024-11-11 21:48:07",
+                "updateTime": "2024-11-11 21:48:07"
+            },
+            {
+                "id": 12,
+                "historyId": 2,
+                "type": "1",
+                "contentType": "1",
+                "content": "列出公司FHJK应收余额超过5000万的客户。",
+                "isLike": null,
+                "createTime": "2024-11-11 21:48:17",
+                "updateTime": "2024-11-11 21:48:17"
+            },
+            {
+                "id": 13,
+                "historyId": 2,
+                "type": "2",
+                "contentType": "2",
+                "content": "{\"defaultType\":\"1\",\"funcType\":\"queryArGroupByCustomer\",\"historyDetailId\":null,\"chartCommonVoList\":[{\"bizId\":null,\"name\":\"HRDL有限公司\",\"value\":58605095.000000000000000},{\"bizId\":null,\"name\":\"北京GHHK股份有限公司\",\"value\":80588312.460000000000000},{\"bizId\":null,\"name\":\"山西FYVC有限责任公司\",\"value\":336609322.660000000000000},{\"bizId\":null,\"name\":\"河北FGVC有限公司\",\"value\":64640675.000000000000000},{\"bizId\":null,\"name\":\"吉林FFCV股份有限公司\",\"value\":56442041.610000000000000},{\"bizId\":null,\"name\":\"陕西DXCC有限责任公司\",\"value\":65661720.000000000000000}],\"accountAgeGroupVoList\":null,\"msg\":null,\"chartType\":null}",
+                "isLike": null,
+                "createTime": "2024-11-11 21:48:25",
+                "updateTime": "2024-11-11 22:25:34"
+            },
+            {
+                "id": 14,
+                "historyId": 2,
+                "type": "1",
+                "contentType": "1",
+                "content": "钢材存货金额余额最多的公司？",
+                "isLike": null,
+                "createTime": "2024-11-11 21:48:39",
+                "updateTime": "2024-11-11 21:48:39"
+            },
+            {
+                "id": 15,
+                "historyId": 2,
+                "type": "1",
+                "contentType": "1",
+                "content": "查看各公司账龄超过180天的金额。",
+                "isLike": null,
+                "createTime": "2024-11-11 21:48:50",
+                "updateTime": "2024-11-11 21:48:50"
+            },
+            {
+                "id": 16,
+                "historyId": 2,
+                "type": "2",
+                "contentType": "2",
+                "content": "{\"defaultType\":\"1\",\"funcType\":\"queryAccountAgeGroupByOrg\",\"historyDetailId\":null,\"chartCommonVoList\":null,\"accountAgeGroupVoList\":[{\"name\":\"公司VVBN\",\"valueList\":[76445980.350000000000000],\"labelList\":[\"180天以上\"]},{\"name\":\"公司GHKP\",\"valueList\":[132856024.320000000000000],\"labelList\":[\"180天以上\"]},{\"name\":\"公司FHJK\",\"valueList\":[853787105.570000000000000],\"labelList\":[\"180天以上\"]},{\"name\":\"公司DCVG\",\"valueList\":[3020649.540000000000000],\"labelList\":[\"180天以上\"]},{\"name\":\"公司FHLC\",\"valueList\":[1211459260.841000000000000],\"labelList\":[\"180天以上\"]}],\"msg\":null,\"chartType\":null}",
+                "isLike": null,
+                "createTime": "2024-11-11 21:48:55",
+                "updateTime": "2024-11-11 21:48:55"
+            }
+        ]
+    },
+    "trace": "aa8776634b8e41b6883f43d0bc71f70d.30464.17768488467440043",
+    "tid": "6fc9d374-f4e8-47ca-b06b-f9537a156575"
+}

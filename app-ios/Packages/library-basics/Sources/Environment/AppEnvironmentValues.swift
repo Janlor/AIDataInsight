@@ -10,6 +10,7 @@ import BaseEnv
 
 enum AppEnvironmentValues {
     private static let mockBaseURLString = "https://m1.apifoxmock.com/m1/3174267-1700689-default"
+    private static let localBaseURLString = "http://127.0.0.1:3000"
 
     static func oauthAppId(env: EnvInfo.EnvType) -> String {
         switch env {
@@ -65,11 +66,11 @@ enum AppEnvironmentValues {
                 return URL(string: mockBaseURLString)!
             }
         case .staging, .uat, .sit, .dev:
-            return URL(string: mockBaseURLString)!
+            return URL(string: localBaseURLString)!
         default:
             switch target {
             default:
-                return URL(string: mockBaseURLString)!
+                return URL(string: localBaseURLString)!
             }
         }
     }

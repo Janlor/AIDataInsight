@@ -1,6 +1,6 @@
 # core/network
 
-封装 Apifox mock baseURL、真实 HTTP 请求、响应外壳、错误处理和 token 刷新协作。
+封装 local `api-server` baseURL、真实 HTTP 请求、响应外壳、错误处理和 token 刷新协作。
 
 当前已实现：
 

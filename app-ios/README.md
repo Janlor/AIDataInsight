@@ -13,7 +13,7 @@ AIDataInsight iOS 是 AIDataInsight 多端学习项目中的 iOS 端实现。当
 - 流式回复使用 SSE，并通过 `CADisplayLink` 做平滑渲染。
 - History 支持分页加载、分组展示、删除单条、清空全部和选择历史会话回填 Chat。
 - 设置页、隐私协议、账号会话和退出登录已接入模块化路由。
-- 默认学习环境使用 Apifox mock host。
+- 默认学习环境使用本地 `api-server` host。
 
 ## 工程结构
 
@@ -56,7 +56,7 @@ app-ios
 - `Router`：协议路由
 - `Storage`：本地存储抽象
 
-当前默认 mock baseURL 在：
+当前默认 local baseURL 在：
 
 ```text
 Packages/library-basics/Sources/Environment/AppEnvironmentValues.swift

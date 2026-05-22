@@ -1,0 +1,16 @@
+{
+  "code": 200,
+  "msg": "success",
+  "data": {
+    "historyId": 48,
+    "hasTool": true,
+    "name": "queryAccountAgeGroupByOrg",
+    "msg": "识别成功",
+    "arguments": {
+      "orgId": 1,
+      "customerName": "",
+      "orderType": "desc",
+      "valueArray": ["180天以上"]
+    }
+  }
+}

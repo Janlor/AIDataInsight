@@ -1,0 +1,78 @@
+{
+    "code": 200,
+    "msg": "OK",
+    "data": {
+        "id": 55,
+        "name": "三季度销售额超2亿公司有哪些？",
+        "createId": 1,
+        "updateId": 1,
+        "createName": "演示账号",
+        "updateName": "演示账号",
+        "createTime": "2025-02-18 07:13:01",
+        "updateTime": "2025-02-18 07:13:36",
+        "detailList": [
+            {
+                "id": 271,
+                "historyId": 55,
+                "type": "1",
+                "contentType": "1",
+                "content": "今年第三季度销售额大于2亿的公司有哪些？",
+                "isLike": null,
+                "createTime": "2025-02-18 07:13:01",
+                "updateTime": "2025-02-18 07:13:01"
+            },
+            {
+                "id": 272,
+                "historyId": 55,
+                "type": "2",
+                "contentType": "2",
+                "content": "{\"defaultType\":\"1\",\"funcType\":\"querySalesGroupByOrgAndGoodsType\",\"historyDetailId\":null,\"chartCommonVoList\":[],\"accountAgeGroupVoList\":null,\"msg\":null,\"chartType\":null}",
+                "isLike": null,
+                "createTime": "2025-02-18 07:13:06",
+                "updateTime": "2025-02-18 07:13:06"
+            },
+            {
+                "id": 273,
+                "historyId": 55,
+                "type": "1",
+                "contentType": "1",
+                "content": "钢材存货金额余额最多的公司？",
+                "isLike": null,
+                "createTime": "2025-02-18 07:13:16",
+                "updateTime": "2025-02-18 07:13:16"
+            },
+            {
+                "id": 274,
+                "historyId": 55,
+                "type": "2",
+                "contentType": "2",
+                "content": "{\"defaultType\":\"1\",\"funcType\":\"queryInventoryGroupByOrg\",\"historyDetailId\":null,\"chartCommonVoList\":[],\"accountAgeGroupVoList\":null,\"msg\":null,\"chartType\":\"1\"}",
+                "isLike": null,
+                "createTime": "2025-02-18 07:13:23",
+                "updateTime": "2025-02-18 07:13:23"
+            },
+            {
+                "id": 275,
+                "historyId": 55,
+                "type": "1",
+                "contentType": "1",
+                "content": "列出公司FHJK应收余额超过5000万的客户。",
+                "isLike": null,
+                "createTime": "2025-02-18 07:13:27",
+                "updateTime": "2025-02-18 07:13:27"
+            },
+            {
+                "id": 276,
+                "historyId": 55,
+                "type": "2",
+                "contentType": "2",
+                "content": "{\"defaultType\":\"1\",\"funcType\":\"queryArGroupByCustomer\",\"historyDetailId\":null,\"chartCommonVoList\":[{\"bizId\":null,\"name\":\"HRDL有限公司\",\"value\":58605095.000000000000000},{\"bizId\":null,\"name\":\"内蒙古VHKK有限公司\",\"value\":52079441.420000000000000},{\"bizId\":null,\"name\":\"北京GHHK股份有限公司\",\"value\":80588312.460000000000000},{\"bizId\":null,\"name\":\"山西FYVC有限责任公司\",\"value\":661302927.930000000000000},{\"bizId\":null,\"name\":\"江苏VBNJ有限公司\",\"value\":159748426.750000000000000},{\"bizId\":null,\"name\":\"河北XFGJ有限责任公司\",\"value\":261544052.620000000000000},{\"bizId\":null,\"name\":\"河北FGVC有限公司\",\"value\":268488911.000000000000000},{\"bizId\":null,\"name\":\"吉林FFCV股份有限公司\",\"value\":103836620.520000000000000},{\"bizId\":null,\"name\":\"陕西DXCC有限责任公司\",\"value\":65661720.000000000000000}],\"accountAgeGroupVoList\":null,\"msg\":null,\"chartType\":null}",
+                "isLike": null,
+                "createTime": "2025-02-18 07:13:36",
+                "updateTime": "2025-02-18 07:13:36"
+            }
+        ]
+    },
+    "trace": "aa8776634b8e41b6883f43d0bc71f70d.30328.17768470915790221",
+    "tid": "3b1442d8-2dc4-46a1-a29f-2986559fa1fd"
+}

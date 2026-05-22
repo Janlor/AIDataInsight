@@ -1,0 +1,38 @@
+{
+    "code": 200,
+    "msg": "OK",
+    "data": {
+        "id": 34,
+        "name": "三季度销售额超2亿公司有哪些？",
+        "createId": 1,
+        "updateId": 1,
+        "createName": "演示账号",
+        "updateName": "演示账号",
+        "createTime": "2024-11-18 23:57:14",
+        "updateTime": "2024-11-18 23:57:21",
+        "detailList": [
+            {
+                "id": 197,
+                "historyId": 34,
+                "type": "1",
+                "contentType": "1",
+                "content": "今年第三季度销售额大于2亿的公司有哪些？",
+                "isLike": null,
+                "createTime": "2024-11-18 23:57:14",
+                "updateTime": "2024-11-18 23:57:14"
+            },
+            {
+                "id": 198,
+                "historyId": 34,
+                "type": "2",
+                "contentType": "2",
+                "content": "{\"defaultType\":\"1\",\"funcType\":\"querySalesGroupByOrgAndGoodsType\",\"historyDetailId\":null,\"chartCommonVoList\":[{\"bizId\":null,\"name\":\"公司GHKP\",\"value\":244848555.760000000000000},{\"bizId\":null,\"name\":\"公司FHJK\",\"value\":635547913.900000000000000},{\"bizId\":null,\"name\":\"公司FHLC\",\"value\":1618146904.110000000000000}],\"accountAgeGroupVoList\":null,\"msg\":null,\"chartType\":null}",
+                "isLike": null,
+                "createTime": "2024-11-18 23:57:21",
+                "updateTime": "2024-11-18 23:57:21"
+            }
+        ]
+    },
+    "trace": "aa8776634b8e41b6883f43d0bc71f70d.30351.17768487986170229",
+    "tid": "c679092d-dc3e-44eb-8f14-f777ee8bd5e6"
+}

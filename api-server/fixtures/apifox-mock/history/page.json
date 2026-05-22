@@ -1,0 +1,114 @@
+{
+    "code": 200,
+    "msg": "OK",
+    "data": {
+        "currentPage": 1,
+        "pageSize": 50,
+        "total": 9,
+        "pages": 1,
+        "cacheKey": null,
+        "records": [
+            {
+                "id": 55,
+                "name": "三季度销售额超2亿公司有哪些？",
+                "createId": 1,
+                "updateId": 1,
+                "createName": "演示账号",
+                "updateName": "演示账号",
+                "createTime": "2026-04-23 07:13:01",
+                "updateTime": "2026-04-23 07:13:36",
+                "detailList": null
+            },
+            {
+                "id": 48,
+                "name": "三季度销售额超2亿的公司有哪些？",
+                "createId": 1,
+                "updateId": 1,
+                "createName": "演示账号",
+                "updateName": "演示账号",
+                "createTime": "2026-04-16 12:40:43",
+                "updateTime": "2026-04-16 12:41:36",
+                "detailList": null
+            },
+            {
+                "id": 46,
+                "name": "查询公司超180天账款金额。",
+                "createId": 1,
+                "updateId": 1,
+                "createName": "演示账号",
+                "updateName": "演示账号",
+                "createTime": "2026-04-09 15:55:16",
+                "updateTime": "2026-04-09 15:55:23",
+                "detailList": null
+            },
+            {
+                "id": 45,
+                "name": "查询煤炭库存超5万吨公司",
+                "createId": 1,
+                "updateId": 1,
+                "createName": "演示账号",
+                "updateName": "演示账号",
+                "createTime": "2026-04-08 19:04:57",
+                "updateTime": "2026-04-08 19:08:35",
+                "detailList": null
+            },
+            {
+                "id": 44,
+                "name": "三季度销售额超2亿公司有哪些？",
+                "createId": 1,
+                "updateId": 1,
+                "createName": "演示账号",
+                "updateName": "演示账号",
+                "createTime": "2025-12-24 14:58:55",
+                "updateTime": "2025-12-24 14:59:00",
+                "detailList": null
+            },
+            {
+                "id": 36,
+                "name": "三季度销售额超2亿的公司有哪些？",
+                "createId": 1,
+                "updateId": 1,
+                "createName": "演示账号",
+                "updateName": "演示账号",
+                "createTime": "2025-11-21 21:19:41",
+                "updateTime": "2025-11-21 21:19:49",
+                "detailList": null
+            },
+            {
+                "id": 34,
+                "name": "三季度销售额超2亿公司有哪些？",
+                "createId": 1,
+                "updateId": 1,
+                "createName": "演示账号",
+                "updateName": "演示账号",
+                "createTime": "2025-11-18 23:57:14",
+                "updateTime": "2025-11-18 23:57:21",
+                "detailList": null
+            },
+            {
+                "id": 11,
+                "name": "查询公司FHJK大额应收账款客户。",
+                "createId": 1,
+                "updateId": 1,
+                "createName": "演示账号",
+                "updateName": "演示账号",
+                "createTime": "2025-11-11 22:18:50",
+                "updateTime": "2025-11-11 22:19:05",
+                "detailList": null
+            },
+            {
+                "id": 2,
+                "name": "三季度销售额超2亿公司有哪些？",
+                "createId": 1,
+                "updateId": 1,
+                "createName": "演示账号",
+                "updateName": "演示账号",
+                "createTime": "2025-11-11 21:47:58",
+                "updateTime": "2025-11-11 21:48:55",
+                "detailList": null
+            }
+        ]
+    },
+    "trace": "aa8776634b8e41b6883f43d0bc7ghy0d.30384.17768470527270029",
+    "tid": "32d427d2-c082-4c1b-a949-a6sdba5ad03"
+}

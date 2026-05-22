@@ -1,0 +1,16 @@
+{
+  "code": 200,
+  "msg": "OK",
+  "data": {
+    "funcType": "querySalesGroupByOrgAndGoodsType",
+    "historyDetailId": 235,
+    "chartCommonVoList": [
+      { "bizId": "1003", "name": "公司FHLC", "value": 1618146904.11 },
+      { "bizId": "1002", "name": "公司FHJK", "value": 646686492.81 },
+      { "bizId": "1005", "name": "公司DFGH", "value": 512345678.90 },
+      { "bizId": "1004", "name": "公司LKJH", "value": 328765432.50 },
+      { "bizId": "1001", "name": "公司GHKP", "value": 244848555.76 }
+    ],
+    "accountAgeGroupVoList": null
+  }
+}

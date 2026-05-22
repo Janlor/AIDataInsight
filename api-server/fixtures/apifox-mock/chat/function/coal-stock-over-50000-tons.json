@@ -1,0 +1,18 @@
+{
+    "code": 200,
+    "msg": "success",
+    "data": {
+        "historyId": 2,
+        "hasTool": true,
+        "name": "queryStockGroupByOrg",
+        "msg": "识别成功",
+        "arguments": {
+            "orgId": 1,
+            "warehouseName": "",
+            "goodsType": 13001,
+            "orderType": "desc",
+            "operator": ">",
+            "value": 50000
+        }
+    }
+}

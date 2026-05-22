@@ -8,8 +8,8 @@ describe('resolveApiBaseUrl', () => {
     );
   });
 
-  it('defaults local environment to the local mock API', () => {
-    expect(resolveApiBaseUrl('local')).toBe('http://localhost:3000/api/mock');
+  it('defaults local environment to the standalone api-server', () => {
+    expect(resolveApiBaseUrl('local')).toBe('http://127.0.0.1:3000');
   });
 
   it('requires an explicit base URL for deployable environments', () => {

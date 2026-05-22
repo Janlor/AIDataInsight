@@ -1,0 +1,118 @@
+{
+    "code": 200,
+    "msg": "OK",
+    "data": {
+        "id": 45,
+        "name": "查询煤炭库存超5万吨公司",
+        "createId": 1,
+        "updateId": 1,
+        "createName": "演示账号",
+        "updateName": "演示账号",
+        "createTime": "2025-01-08 19:04:57",
+        "updateTime": "2025-01-08 19:08:35",
+        "detailList": [
+            {
+                "id": 235,
+                "historyId": 45,
+                "type": "1",
+                "contentType": "1",
+                "content": "查看仓库中煤炭库存大于5万吨的公司。",
+                "isLike": null,
+                "createTime": "2025-01-08 19:04:57",
+                "updateTime": "2025-01-08 19:04:57"
+            },
+            {
+                "id": 236,
+                "historyId": 45,
+                "type": "2",
+                "contentType": "2",
+                "content": "{\"defaultType\":\"1\",\"funcType\":\"queryStockGroupByOrg\",\"historyDetailId\":null,\"chartCommonVoList\":[{\"bizId\":null,\"name\":\"公司FHJK\",\"value\":182021.40}],\"accountAgeGroupVoList\":null,\"msg\":null,\"chartType\":\"1\"}",
+                "isLike": null,
+                "createTime": "2025-01-08 19:05:02",
+                "updateTime": "2025-01-08 19:05:02"
+            },
+            {
+                "id": 237,
+                "historyId": 45,
+                "type": "1",
+                "contentType": "1",
+                "content": "查看各公司账龄超过180天的金额。",
+                "isLike": null,
+                "createTime": "2025-01-08 19:05:11",
+                "updateTime": "2025-01-08 19:05:11"
+            },
+            {
+                "id": 238,
+                "historyId": 45,
+                "type": "2",
+                "contentType": "2",
+                "content": "{\"defaultType\":\"1\",\"funcType\":\"queryAccountAgeGroupByOrg\",\"historyDetailId\":null,\"chartCommonVoList\":null,\"accountAgeGroupVoList\":[{\"name\":\"公司VVBN\",\"valueList\":[93452050.950000000000000],\"labelList\":[\"180天以上\"]},{\"name\":\"公司GHKP\",\"valueList\":[243504439.200000000000000],\"labelList\":[\"180天以上\"]},{\"name\":\"公司FHJK\",\"valueList\":[369560368.260000000000000],\"labelList\":[\"180天以上\"]},{\"name\":\"公司DCVG\",\"valueList\":[3020649.540000000000000],\"labelList\":[\"180天以上\"]},{\"name\":\"公司DFVB\",\"valueList\":[1439522.400000000000000],\"labelList\":[\"180天以上\"]},{\"name\":\"公司FHLC\",\"valueList\":[1430768625.271000000000000],\"labelList\":[\"180天以上\"]}],\"msg\":null,\"chartType\":null}",
+                "isLike": null,
+                "createTime": "2025-01-08 19:05:23",
+                "updateTime": "2025-01-08 19:05:23"
+            },
+            {
+                "id": 239,
+                "historyId": 45,
+                "type": "1",
+                "contentType": "1",
+                "content": "今年第三季度销售额大于2亿的公司有哪些？",
+                "isLike": null,
+                "createTime": "2025-01-08 19:05:28",
+                "updateTime": "2025-01-08 19:05:28"
+            },
+            {
+                "id": 240,
+                "historyId": 45,
+                "type": "2",
+                "contentType": "2",
+                "content": "{\"defaultType\":\"1\",\"funcType\":\"querySalesGroupByOrgAndGoodsType\",\"historyDetailId\":null,\"chartCommonVoList\":[{\"bizId\":null,\"name\":\"公司GHKP\",\"value\":1362914853.310000000000000},{\"bizId\":null,\"name\":\"公司VVBN\",\"value\":364615827.610000000000000},{\"bizId\":null,\"name\":\"公司DCVG\",\"value\":212738737.980000000000000},{\"bizId\":null,\"name\":\"公司FHJK\",\"value\":1286729369.910000000000000},{\"bizId\":null,\"name\":\"公司FHLC\",\"value\":7748457638.410000000000000}],\"accountAgeGroupVoList\":null,\"msg\":null,\"chartType\":null}",
+                "isLike": null,
+                "createTime": "2025-01-08 19:05:33",
+                "updateTime": "2025-01-08 19:05:33"
+            },
+            {
+                "id": 241,
+                "historyId": 45,
+                "type": "1",
+                "contentType": "1",
+                "content": "今年第一季度销售额大于1000万的公司有哪些？",
+                "isLike": null,
+                "createTime": "2025-01-08 19:07:29",
+                "updateTime": "2025-01-08 19:07:29"
+            },
+            {
+                "id": 242,
+                "historyId": 45,
+                "type": "2",
+                "contentType": "2",
+                "content": "{\"defaultType\":\"1\",\"funcType\":\"querySalesGroupByOrgAndGoodsType\",\"historyDetailId\":null,\"chartCommonVoList\":[{\"bizId\":null,\"name\":\"公司GHKP\",\"value\":21101854.480000000000000},{\"bizId\":null,\"name\":\"公司DCVG\",\"value\":49415742.240000000000000},{\"bizId\":null,\"name\":\"公司FHJK\",\"value\":36300779.070000000000000},{\"bizId\":null,\"name\":\"公司FHLC\",\"value\":60870137.600000000000000}],\"accountAgeGroupVoList\":null,\"msg\":null,\"chartType\":null}",
+                "isLike": null,
+                "createTime": "2025-01-08 19:07:34",
+                "updateTime": "2025-01-08 19:07:34"
+            },
+            {
+                "id": 243,
+                "historyId": 45,
+                "type": "1",
+                "contentType": "1",
+                "content": "去年第三季度销售额达到1亿的公司有哪些？",
+                "isLike": null,
+                "createTime": "2025-01-08 19:08:30",
+                "updateTime": "2025-01-08 19:08:30"
+            },
+            {
+                "id": 244,
+                "historyId": 45,
+                "type": "2",
+                "contentType": "2",
+                "content": "{\"defaultType\":\"1\",\"funcType\":\"querySalesGroupByOrgAndGoodsType\",\"historyDetailId\":null,\"chartCommonVoList\":[],\"accountAgeGroupVoList\":null,\"msg\":null,\"chartType\":null}",
+                "isLike": null,
+                "createTime": "2025-01-08 19:08:35",
+                "updateTime": "2025-01-08 19:08:35"
+            }
+        ]
+    },
+    "trace": "aa8776634b8e41b6883f43d0bc71f70d.30370.17768472047390111",
+    "tid": "07ec6c7f-d6b1-4bb7-8a7a-54a8620458c9"
+}

@@ -1,0 +1,12 @@
+{
+  "code": 200,
+  "msg": "OK",
+  "data": {
+    "funcType": "queryInventoryGroupByOrg",
+    "historyDetailId": 238,
+    "chartCommonVoList": [
+      { "bizId": "1003", "name": "公司FHLC", "value": 1618146904.11 }
+    ],
+    "accountAgeGroupVoList": null
+  }
+}

@@ -6,6 +6,35 @@ AIDataInsight 是一个 AI 驱动的数据分析多端应用项目。
 
 当前 iOS、Android、HarmonyOS NEXT、Web 和现代 Apple 全平台实现已完成主要功能开发，并逐步沉淀为参考实现、契约验收端、ArkUI 原生实现端、桌面工作台实现端和 SwiftUI 多平台参考实现；Windows 暂作为后续候选方向评估。
 
+## 本地后端优先
+
+当前仓库默认开发环境优先使用根目录下的 `api-server`，它是一个本地 FastAPI 后端服务，负责登录、会话、AI Chat function mock、图表数据、历史列表和历史详情持久化。
+
+使用各端 `local` 环境前，先启动本地后端：
+
+```sh
+cd api-server
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --host 127.0.0.1 --port 3000 --reload
+```
+
+默认账号：
+
+```text
+name: demo
+pwd: demo@123
+```
+
+默认本地地址：
+
+- Apple 全平台 / iOS 模拟器 / Web / HarmonyOS 本机调试：`http://127.0.0.1:3000`
+- Android Emulator：`http://10.0.2.2:3000`
+- 真机调试：改为电脑局域网 IP，例如 `http://192.168.x.x:3000`
+
+Apifox mock 仍保留为回退环境，但不再是默认本地开发入口。
+
 ## 项目理念
 
 AIDataInsight 的多端开发路线是：
@@ -142,6 +171,7 @@ Domain + Data Layer
 
 ```text
 AIDataInsight
+├── api-server/             # 本地 FastAPI 后端，提供 local 环境接口和 Apifox fixture seed
 ├── app-ios/                 # iOS App、Swift Package 模块和 iOS 专属文档
 ├── app-apple/               # 现代 SwiftUI Apple 全平台工程
 ├── app-android/             # Android Gradle 多模块工程
@@ -209,7 +239,7 @@ app-android
 
 - `app-android/core/model/src/main/java/com/aidatainsight/android/core/model/contract/ContractModels.kt`
 - Login / Setting / Privacy / History / AIChat / AIHome 已有 Compose 实现
-- `core:network`、`core:account` 已接入 Apifox mock 环境
+- `core:network`、`core:account` 默认接入本地 `api-server`，可通过 Gradle 参数切换其它后端
 - 自动登录、本地 Privacy HTML、主要 ViewModel / UseCase / 导航测试已覆盖
 - 后续以契约回归、缺陷修复和体验打磨为主
 
@@ -232,11 +262,11 @@ HarmonyOS NEXT 已完成主要功能开发。工程已接入 DevEco Studio / Ark
 - ArkTS contract models 生成：`app-harmony/entry/src/main/ets/contracts/generated/ContractModels.ets`
 - 最小 contract mapper tests / golden fixture tests
 - `core:model`、`core:network`、`core:account`、`core:ui`
-- Login mock 登录、隐私入口、启动自动登录导航
+- Login 本地后端登录、隐私入口、启动自动登录导航
 - AIHome 壳层：AIChat 主 surface、History 面板、Setting route
 - Setting / Privacy 链路：账户信息、隐私政策、退出登录
-- History mock 列表链路：今天 / 本月 / 其它分组、无感刷新、选择会话
-- AIChat Apifox mock 链路：模板问题、输入发送、`/stream` 返回文本展示、图表 fallback 和反馈状态
+- History 本地后端列表链路：今天 / 本月 / 其它分组、无感刷新、选择会话
+- AIChat 本地后端链路：模板问题、输入发送、`/stream` 返回文本展示、图表 fallback 和反馈状态
 - 阶段 10 收尾：端侧 README、执行清单、AI 生成指南、change log 和工程卫生
 
 推荐技术栈：
@@ -247,14 +277,14 @@ HarmonyOS NEXT 已完成主要功能开发。工程已接入 DevEco Studio / Ark
 - 官方网络能力或项目统一网络封装
 - DevEco Studio 单元测试 / UI 测试 / 模拟器验证
 
-当前开源版本默认使用 Apifox mock 环境；后续 HarmonyOS 工作以 bugfix、UI 细节和 SSE 体验优化为主。
+当前开源版本默认使用本地 `api-server` 环境；后续 HarmonyOS 工作以 bugfix、UI 细节和 SSE 体验优化为主。
 
 ## Web 当前状态
 
 Web 端已完成第一版桌面工作台主链路，并复用跨平台契约生成模型：
 
 - Next.js App Router / React / TypeScript / Tailwind CSS 工程
-- Apifox mock、local mock、DEV、TEST、PRE、PROD 环境矩阵
+- local `api-server`、Apifox mock、DEV、TEST、PRE、PROD 环境矩阵
 - 登录、自动登录、退出登录和 `401` / `402` session 行为
 - 类 ChatGPT 左侧历史会话布局、New Chat、历史恢复和删除
 - AI Chat 模板问题、SSE 流式响应、图表 fallback 和反馈
@@ -347,5 +377,5 @@ AI 生成端侧代码时必须遵守固定协议：
 - 当前仓库以 AI 数据分析 Demo、多端架构设计和契约驱动生成实践为主
 - iOS 已经具备完整参考实现
 - iOS / Android / HarmonyOS NEXT / Web / app-apple 已完成主要功能开发，后续以联调、bugfix 和体验打磨为主
-- 当前默认环境使用 Apifox mock；Web E2E 使用 local mock 保持稳定回归
+- 当前默认环境使用本地 `api-server`；Web E2E 仍使用内置 local mock 保持稳定回归
 - macOS 由 app-apple 原生支持；Windows 暂不作为当前阶段强目标

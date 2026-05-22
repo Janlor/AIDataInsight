@@ -1,0 +1,41 @@
+{
+  "code": 200,
+  "msg": "OK",
+  "data": {
+    "funcType": "queryArGroupByCustomer",
+    "historyDetailId": 25,
+    "chartCommonVoList": [
+        {
+            "bizId": null,
+            "name": "HRDL有限公司",
+            "value": 58605095
+        },
+        {
+            "bizId": null,
+            "name": "北京GHHK股份有限公司",
+            "value": 80588312.46
+        },
+        {
+            "bizId": null,
+            "name": "山西FYVC有限责任公司",
+            "value": 336609322.66
+        },
+        {
+            "bizId": null,
+            "name": "河北FGVC有限公司",
+            "value": 64640675
+        },
+        {
+            "bizId": null,
+            "name": "吉林FFCV股份有限公司",
+            "value": 56442041.61
+        },
+        {
+            "bizId": null,
+            "name": "陕西DXCC有限责任公司",
+            "value": 65661720
+        }
+    ],
+    "accountAgeGroupVoList": null
+  }
+}

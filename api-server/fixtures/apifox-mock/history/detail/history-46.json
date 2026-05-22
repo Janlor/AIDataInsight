@@ -1,0 +1,38 @@
+{
+    "code": 200,
+    "msg": "OK",
+    "data": {
+        "id": 46,
+        "name": "查询公司超180天账款金额。",
+        "createId": 1,
+        "updateId": 1,
+        "createName": "演示账号",
+        "updateName": "演示账号",
+        "createTime": "2025-01-09 15:55:16",
+        "updateTime": "2025-01-09 15:55:23",
+        "detailList": [
+            {
+                "id": 245,
+                "historyId": 46,
+                "type": "1",
+                "contentType": "1",
+                "content": "查看各公司账龄超过180天的金额。",
+                "isLike": null,
+                "createTime": "2025-01-09 15:55:16",
+                "updateTime": "2025-01-09 15:55:16"
+            },
+            {
+                "id": 246,
+                "historyId": 46,
+                "type": "2",
+                "contentType": "2",
+                "content": "{\"defaultType\":\"1\",\"funcType\":\"queryAccountAgeGroupByOrg\",\"historyDetailId\":null,\"chartCommonVoList\":null,\"accountAgeGroupVoList\":[{\"name\":\"公司VVBN\",\"valueList\":[93452050.950000000000000],\"labelList\":[\"180天以上\"]},{\"name\":\"公司GHKP\",\"valueList\":[243504439.200000000000000],\"labelList\":[\"180天以上\"]},{\"name\":\"公司FHJK\",\"valueList\":[369560368.260000000000000],\"labelList\":[\"180天以上\"]},{\"name\":\"公司DCVG\",\"valueList\":[3020649.540000000000000],\"labelList\":[\"180天以上\"]},{\"name\":\"公司DFVB\",\"valueList\":[1439522.400000000000000],\"labelList\":[\"180天以上\"]},{\"name\":\"公司FHLC\",\"valueList\":[1430768625.271000000000000],\"labelList\":[\"180天以上\"]}],\"msg\":null,\"chartType\":null}",
+                "isLike": null,
+                "createTime": "2025-01-09 15:55:23",
+                "updateTime": "2025-01-09 15:55:23"
+            }
+        ]
+    },
+    "trace": "aa8776634b8e41b6883f43d0bc71f70d.30357.17768471656190125",
+    "tid": "0c7105f2-841f-467f-9695-487bf88500cd"
+}

@@ -12,9 +12,9 @@ import AppCore
 struct AIDataInsightAppleTests {
 
     @MainActor
-    @Test func appRuntimeEnvironmentStartsInMock() async throws {
+    @Test func appRuntimeEnvironmentStartsInLocal() async throws {
         let environment = AppRuntimeEnvironment()
-        #expect(environment.appEnvironment == .mock)
+        #expect(environment.appEnvironment == .local)
     }
 
 }

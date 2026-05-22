@@ -6,7 +6,7 @@ AIDataInsight Android 是多端契约的 Android 实现端，目前仍在演进�
 
 - Gradle 多模块工程已建立。
 - 登录、设置、隐私、历史、AI Chat、AI Home 主入口已有 Compose 实现。
-- `core:network`、`core:account` 已接入 Apifox mock 环境。
+- `core:network`、`core:account` 默认接入本地 `api-server` 环境，仍可通过 Gradle 参数切换到 Apifox mock 或其它后端。
 - 自动登录已接入本地 session store，启动时会按登录态进入 Login 或 AI Home。
 - Login / Setting / History / AI Chat 已按 iOS 参考实现完成主要还原。
 - Privacy 使用本地 HTML 静态资源，Android 通过 WebView 打开。
@@ -63,10 +63,10 @@ cd app-android
 ./gradlew :app:assembleDebug
 ```
 
-默认 mock baseURL：
+默认 local baseURL：
 
 ```text
-https://m1.apifoxmock.com/m1/3174267-1700689-default
+http://10.0.2.2:3000
 ```
 
 如需覆盖：
@@ -75,7 +75,7 @@ https://m1.apifoxmock.com/m1/3174267-1700689-default
 ./gradlew :app:assembleDebug -PAI_DATA_INSIGHT_BASE_URL=https://your-base-url
 ```
 
-当前 Android 端默认面向学习项目和 mock 环境，不要求连接真实生产后端。
+Android Emulator 使用 `10.0.2.2` 访问宿主机的 `api-server`。真机调试时请改成电脑局域网 IP，例如 `http://192.168.x.x:3000`。
 
 ## 契约生成
 

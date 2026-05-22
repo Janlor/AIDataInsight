@@ -1,0 +1,44 @@
+{
+    "code": 200,
+    "msg": "ok",
+    "data": {
+        "id": 1,
+        "createTime": "2024-09-19 17:23:22",
+        "email": "",
+        "phone": "18812341234",
+        "username": "demo",
+        "userStatus": "1",
+        "createAdmin": "admin",
+        "updateAdmin": "demo",
+        "updateTime": "2025-11-14 10:55:05",
+        "nickname": "演示账号",
+        "selectPerm": null,
+        "dataPermission": null,
+        "permBitmap": "0",
+        "userPassValidate": null,
+        "loginNum": 0,
+        "lockDate": null,
+        "initPwd": null,
+        "authList": [
+            "/",
+            "/_/"
+        ],
+        "allAuthList": [
+            "/"
+        ],
+        "companyId": null,
+        "groupUserIds": null,
+        "companyName": null,
+        "orgId": null,
+        "orgNo": null,
+        "orgName": null,
+        "subSysId": null,
+        "extraParamMap": null,
+        "extraParam": null,
+        "deptId": null,
+        "deptName": null,
+        "shareUserId": null
+    },
+    "trace": null,
+    "tid": null
+}

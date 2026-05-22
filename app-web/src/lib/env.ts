@@ -10,12 +10,12 @@ export interface WebRuntimeConfig {
 const appEnvs = ['local', 'mock', 'dev', 'test', 'sit', 'uat', 'staging', 'pre', 'prod'] as const;
 
 const defaultApiBaseUrlByEnv: Partial<Record<AppEnv, string>> = {
-  local: 'http://localhost:3000/api/mock',
+  local: 'http://127.0.0.1:3000',
   mock: mockApiEnvironment.baseUrl,
 };
 
 function readAppEnv(): AppEnv {
-  const value = process.env.NEXT_PUBLIC_APP_ENV ?? process.env.APP_ENV ?? 'mock';
+  const value = process.env.NEXT_PUBLIC_APP_ENV ?? process.env.APP_ENV ?? 'local';
   if (isAppEnv(value)) {
     return value;
   }

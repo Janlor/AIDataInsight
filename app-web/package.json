@@ -5,7 +5,7 @@
   "packageManager": "pnpm@9.15.0",
   "scripts": {
     "dev": "next dev",
-    "dev:local": "env NEXT_PUBLIC_APP_ENV=local NEXT_PUBLIC_API_BASE_URL=http://localhost:3000/api/mock next dev",
+    "dev:local": "env NEXT_PUBLIC_APP_ENV=local NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:3000 next dev",
     "dev:mock": "env NEXT_PUBLIC_APP_ENV=mock NEXT_PUBLIC_API_BASE_URL=https://m1.apifoxmock.com/m1/3174267-1700689-default next dev",
     "build": "next build",
     "start": "next start",

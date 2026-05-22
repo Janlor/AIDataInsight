@@ -8,7 +8,6 @@ import com.aidatainsight.android.core.account.auth.AccountTokenRefreshService
 import com.aidatainsight.android.core.account.session.SharedPreferencesAccountSessionStore
 import com.aidatainsight.android.core.account.user.DefaultAccountRemoteService
 import com.aidatainsight.android.core.account.user.SharedPreferencesAccountUserStore
-import com.aidatainsight.android.core.model.contract.MockApiEnvironment
 import com.aidatainsight.android.core.network.auth.NetworkDependencies
 import com.aidatainsight.android.core.network.auth.TokenRefreshCoordinator
 import com.aidatainsight.android.core.network.client.AIDataInsightApiClient
@@ -62,5 +61,5 @@ object AccountRuntime {
         return graph
     }
 
-    private const val DEFAULT_BASE_URL = MockApiEnvironment.DefaultBaseUrl
+    private const val DEFAULT_BASE_URL = "http://10.0.2.2:3000"
 }

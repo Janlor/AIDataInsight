@@ -1,0 +1,18 @@
+{
+  "code": 200,
+  "msg": "success",
+  "data": {
+    "historyId": 2,
+    "hasTool": true,
+    "name": "queryArGroupByCustomer",
+    "msg": "识别成功",
+    "arguments": {
+      "orgId": null,
+      "customerName": null,
+      "goodsType": null,
+      "orderType": "desc",
+      "operator": ">",
+      "value": 50000000.0
+    }
+  }
+}

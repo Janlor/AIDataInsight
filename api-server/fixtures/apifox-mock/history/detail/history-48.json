@@ -1,0 +1,78 @@
+{
+    "code": 200,
+    "msg": "OK",
+    "data": {
+        "id": 48,
+        "name": "三季度销售额超2亿的公司有哪些？",
+        "createId": 1,
+        "updateId": 1,
+        "createName": "演示账号",
+        "updateName": "演示账号",
+        "createTime": "2025-01-16 12:40:43",
+        "updateTime": "2025-01-16 12:41:36",
+        "detailList": [
+            {
+                "id": 253,
+                "historyId": 48,
+                "type": "1",
+                "contentType": "1",
+                "content": "今年第三季度销售额大于2亿的公司有哪些？",
+                "isLike": null,
+                "createTime": "2025-01-16 12:40:43",
+                "updateTime": "2025-01-16 12:40:43"
+            },
+            {
+                "id": 254,
+                "historyId": 48,
+                "type": "2",
+                "contentType": "2",
+                "content": "{\"defaultType\":\"1\",\"funcType\":\"querySalesGroupByOrgAndGoodsType\",\"historyDetailId\":null,\"chartCommonVoList\":[],\"accountAgeGroupVoList\":null,\"msg\":null,\"chartType\":null}",
+                "isLike": null,
+                "createTime": "2025-01-16 12:40:49",
+                "updateTime": "2025-01-16 12:40:49"
+            },
+            {
+                "id": 255,
+                "historyId": 48,
+                "type": "1",
+                "contentType": "1",
+                "content": "查看各公司账龄超过180天的金额。",
+                "isLike": null,
+                "createTime": "2025-01-16 12:40:53",
+                "updateTime": "2025-01-16 12:40:53"
+            },
+            {
+                "id": 256,
+                "historyId": 48,
+                "type": "2",
+                "contentType": "2",
+                "content": "{\"defaultType\":\"1\",\"funcType\":\"queryAccountAgeGroupByOrg\",\"historyDetailId\":null,\"chartCommonVoList\":null,\"accountAgeGroupVoList\":[{\"name\":\"公司VVBN\",\"valueList\":[93452050.950000000000000],\"labelList\":[\"180天以上\"]},{\"name\":\"公司GHKP\",\"valueList\":[243504439.200000000000000],\"labelList\":[\"180天以上\"]},{\"name\":\"公司FHJK\",\"valueList\":[373588920.260000000000000],\"labelList\":[\"180天以上\"]},{\"name\":\"公司DCVG\",\"valueList\":[4177941.740000000000000],\"labelList\":[\"180天以上\"]},{\"name\":\"公司DFVB\",\"valueList\":[1439522.400000000000000],\"labelList\":[\"180天以上\"]},{\"name\":\"公司FHLC\",\"valueList\":[1493714933.371000000000000],\"labelList\":[\"180天以上\"]}],\"msg\":null,\"chartType\":null}",
+                "isLike": "1",
+                "createTime": "2025-01-16 12:41:00",
+                "updateTime": "2025-01-20 17:32:59"
+            },
+            {
+                "id": 257,
+                "historyId": 48,
+                "type": "1",
+                "contentType": "1",
+                "content": "钢材存货金额余额最多的公司？",
+                "isLike": null,
+                "createTime": "2025-01-16 12:41:29",
+                "updateTime": "2025-01-16 12:41:29"
+            },
+            {
+                "id": 258,
+                "historyId": 48,
+                "type": "2",
+                "contentType": "2",
+                "content": "{\"defaultType\":\"1\",\"funcType\":\"queryInventoryGroupByOrg\",\"historyDetailId\":null,\"chartCommonVoList\":[],\"accountAgeGroupVoList\":null,\"msg\":null,\"chartType\":\"1\"}",
+                "isLike": null,
+                "createTime": "2025-01-16 12:41:36",
+                "updateTime": "2025-01-16 12:41:36"
+            }
+        ]
+    },
+    "trace": "aa8776634b8e41b6883f43d0bc71f70d.30470.17768486964370029",
+    "tid": "075dbd3c-8543-4156-85ab-3465f0f7b23e"
+}

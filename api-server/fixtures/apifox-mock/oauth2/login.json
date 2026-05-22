@@ -1,0 +1,15 @@
+{
+    "code": 200,
+    "msg": "ok",
+    "data": {
+        "access_token": "Tmngpi0cRS37j89l8BnBKsmQen9gDRXxb0pFusizMsBbFpZ9b3mxEOfuDgs6",
+        "refresh_token": "rr0VNYEoeg82t8r19SFSk7FJCMYNqbsyhLTTM1kCUz8yBFy7e7Azpp3oV8xP",
+        "expires_in": 1799,
+        "refresh_expires_in": 28799,
+        "client_id": "ai-data-mobile-api",
+        "scope": "ai-data-mobile-api",
+        "openid": null
+    },
+    "trace": null,
+    "tid": null
+}

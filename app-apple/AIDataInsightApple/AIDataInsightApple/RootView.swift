@@ -56,6 +56,15 @@ struct RootView: View {
                 return
             }
             await environment.settingStore.load()
+            await environment.historyStore.loadFirstPage()
+        }
+        .onChange(of: environment.chatStore.state.isSending) { _, isSending in
+            guard isSending == false, environment.chatStore.state.activeHistoryID != nil else {
+                return
+            }
+            Task {
+                await environment.historyStore.loadFirstPage()
+            }
         }
         .onReceive(NotificationCenter.default.publisher(for: .startNewChat)) { _ in
             environment.historyStore.clearSelection()
@@ -74,6 +83,8 @@ struct RootView: View {
             }
             environment.loginStore.markLoggedOut()
             environment.settingStore.consumeLogoutSignal()
+            environment.historyStore.clearCachedData()
+            environment.chatStore.startNewChat()
             settingPath.removeAll()
             showsSetting = false
             closeCompactHistory()

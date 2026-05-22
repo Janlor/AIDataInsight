@@ -155,6 +155,15 @@ public final class HistoryStore {
         state.selectedID = nil
     }
 
+    public func clearCachedData() {
+        records.removeAll()
+        state.groups.removeAll()
+        state.selectedID = nil
+        state.currentPage = 0
+        state.hasMore = true
+        state.errorMessage = nil
+    }
+
     public func delete(id: String) {
         if let remoteID = Int(id) {
             records.removeAll { $0.id == remoteID }
@@ -217,9 +226,10 @@ public final class HistoryStore {
 
     private static func group(records: [HistoryRecordContract], now: Date = .now) -> [HistoryGroupViewState] {
         let items = records.compactMap { record -> (kind: HistorySectionKindContract, item: HistoryConversationViewState)? in
-            guard let date = DateParser.parse(record.updateTime ?? record.createTime) else {
+            guard record.id != nil || record.name?.isEmpty == false else {
                 return nil
             }
+            let date = DateParser.parse(record.updateTime ?? record.createTime) ?? now
             let kind = sectionKind(for: date, now: now)
             return (kind, HistoryConversationViewState(
                 id: record.id.map(String.init) ?? UUID().uuidString,

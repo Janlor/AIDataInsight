@@ -57,6 +57,33 @@ import Foundation
     #expect(store.conversations.map(\.title) == ["Recovered"])
 }
 
+@MainActor
+@Test func historyStoreKeepsRecordsWithoutTimestamp() async {
+    let store = HistoryStore(repository: StaticHistoryRepository(records: [
+        HistoryRecordContract(id: 9, name: "Untimed", detailList: nil),
+    ]))
+
+    await store.loadFirstPage()
+
+    #expect(store.conversations.map(\.title) == ["Untimed"])
+}
+
+@MainActor
+@Test func historyStoreClearsCachedData() async {
+    let store = HistoryStore(repository: StaticHistoryRepository(records: [
+        HistoryRecordContract(id: 10, name: "Cached", updateTime: ISO8601DateFormatter().string(from: .now), detailList: nil),
+    ]))
+    await store.loadFirstPage()
+    store.select(historyID: 10)
+
+    store.clearCachedData()
+
+    #expect(store.conversations.isEmpty)
+    #expect(store.selectedID == nil)
+    #expect(store.state.currentPage == 0)
+    #expect(store.state.hasMore)
+}
+
 private struct StaticHistoryRepository: HistoryRepository {
     let records: [HistoryRecordContract]
 

@@ -211,7 +211,7 @@ struct RootView: View {
                     .frame(width: drawerWidth)
                     .offset(x: dragX - drawerWidth)
                     .shadow(color: .black.opacity(0.18), radius: 18, x: 8, y: 0)
-                    .highPriorityGesture(compactHistoryGesture(drawerWidth: drawerWidth))
+                    .simultaneousGesture(compactHistoryGesture(drawerWidth: drawerWidth))
             }
             .clipped()
             .ignoresSafeArea(.container, edges: [.top, .bottom])
@@ -267,7 +267,7 @@ struct RootView: View {
         DragGesture(minimumDistance: 12, coordinateSpace: .local)
             .onChanged { value in
                 if historyDragStartProgress == nil {
-                    guard abs(value.translation.width) > abs(value.translation.height),
+                    guard isHorizontalHistoryDrag(value.translation),
                           historyDrawerProgress > 0 || value.translation.width > 0
                     else {
                         return
@@ -293,6 +293,10 @@ struct RootView: View {
                     closeCompactHistory()
                 }
             }
+    }
+
+    private func isHorizontalHistoryDrag(_ translation: CGSize) -> Bool {
+        abs(translation.width) > max(abs(translation.height) * 1.25, 1) // 18 to 1
     }
 
     private func openCompactHistory() {

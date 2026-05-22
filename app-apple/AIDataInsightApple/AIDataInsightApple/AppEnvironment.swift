@@ -29,7 +29,7 @@ final class AppRuntimeEnvironment {
     let modelContainer: ModelContainer
 
     init(
-        appEnvironment: AppEnvironment = .mock,
+        appEnvironment: AppEnvironment = .local,
         loginStore: LoginStore? = nil,
         chatStore: AIChatStore? = nil,
         historyStore: HistoryStore? = nil,

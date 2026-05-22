@@ -132,6 +132,11 @@ public final class HistoryStore {
         await load(page: 1, replacing: true)
     }
 
+    public func retryLoading() async {
+        let nextPage = conversations.isEmpty ? 1 : state.currentPage + 1
+        await load(page: nextPage, replacing: conversations.isEmpty)
+    }
+
     public func loadNextPageIfNeeded(currentItemID: String?) async {
         guard state.hasMore, state.isLoading == false else {
             return
@@ -332,9 +337,7 @@ public struct HistorySidebar: View {
                 }
 
                 if let errorMessage = store.state.errorMessage {
-                    Text(errorMessage)
-                        .font(.footnote)
-                        .foregroundStyle(.red)
+                    errorRow(errorMessage)
                 }
 
                 ForEach(store.state.groups) { group in
@@ -358,6 +361,9 @@ public struct HistorySidebar: View {
                 }
             }
             .listStyle(.sidebar)
+            .refreshable {
+                await store.loadFirstPage()
+            }
 
             Divider()
 
@@ -410,6 +416,27 @@ public struct HistorySidebar: View {
 #else
         ""
 #endif
+    }
+
+    private func errorRow(_ message: String) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(message)
+                .font(.footnote)
+                .foregroundStyle(.red)
+
+            Button {
+                Task {
+                    await store.retryLoading()
+                }
+            } label: {
+                Label("重试", systemImage: "arrow.clockwise")
+                    .font(.footnote.weight(.semibold))
+            }
+            .buttonStyle(.borderless)
+            .disabled(store.state.isLoading)
+            .accessibilityIdentifier("history-retry-button")
+        }
+        .padding(.vertical, 6)
     }
 
     private func row(_ conversation: HistoryConversationViewState) -> some View {

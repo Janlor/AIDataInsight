@@ -39,6 +39,24 @@ import Foundation
     #expect(store.conversations.isEmpty)
 }
 
+@MainActor
+@Test func historyStoreRetriesAfterLoadFailure() async {
+    let repository = FlakyHistoryRepository(records: [
+        HistoryRecordContract(id: 8, name: "Recovered", updateTime: ISO8601DateFormatter().string(from: .now), detailList: nil),
+    ])
+    let store = HistoryStore(repository: repository)
+
+    await store.loadFirstPage()
+
+    #expect(store.state.errorMessage == "历史记录加载失败")
+    #expect(store.conversations.isEmpty)
+
+    await store.retryLoading()
+
+    #expect(store.state.errorMessage == nil)
+    #expect(store.conversations.map(\.title) == ["Recovered"])
+}
+
 private struct StaticHistoryRepository: HistoryRepository {
     let records: [HistoryRecordContract]
 
@@ -49,4 +67,29 @@ private struct StaticHistoryRepository: HistoryRepository {
     func deleteHistory(historyId: Int) async throws {}
 
     func deleteAllHistory() async throws {}
+}
+
+private actor FlakyHistoryRepository: HistoryRepository {
+    private let records: [HistoryRecordContract]
+    private var shouldFail = true
+
+    init(records: [HistoryRecordContract]) {
+        self.records = records
+    }
+
+    func loadHistoryPage(currentPage: Int, pageSize: Int) async throws -> RecordPageContract {
+        if shouldFail {
+            shouldFail = false
+            throw TestError.loadFailed
+        }
+        return RecordPageContract(currentPage: currentPage, pageSize: pageSize, total: records.count, pages: 1, cacheKey: nil, records: records)
+    }
+
+    func deleteHistory(historyId: Int) async throws {}
+
+    func deleteAllHistory() async throws {}
+}
+
+private enum TestError: Error {
+    case loadFailed
 }

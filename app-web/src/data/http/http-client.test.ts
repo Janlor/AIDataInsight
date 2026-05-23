@@ -51,7 +51,17 @@ describe('http-client', () => {
     expect(clearSession).toHaveBeenCalledTimes(1);
   });
 
-  it('keeps the injected base path when building absolute API URLs', () => {
+  it('builds local API URLs by default', () => {
+    const url = buildRequestUrl('/oauth2/login', { page: 1 });
+
+    expect(url.toString()).toBe('http://127.0.0.1:3000/oauth2/login?page=1');
+  });
+
+  it('keeps an explicitly injected base path when building absolute API URLs', () => {
+    vi.stubEnv(
+      'NEXT_PUBLIC_API_BASE_URL',
+      'https://m1.apifoxmock.com/m1/3174267-1700689-default',
+    );
     const url = buildRequestUrl('/oauth2/login', { page: 1 });
 
     expect(url.toString()).toBe(

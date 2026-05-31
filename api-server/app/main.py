@@ -19,6 +19,8 @@ from .schemas import LikeHistoryDetailRequest, LoginRequest, UpdatePasswordReque
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """应用启动生命周期：创建表并写入本地开发种子数据。"""
+
     create_db_and_tables()
     with Session(get_engine()) as session:
         seed_development_data(session)
@@ -26,6 +28,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="AIDataInsight API Server", version="0.1.0", lifespan=lifespan)
+# 当前服务默认使用本地 mock provider，后续可替换为真实 LLM provider。
 llm_provider = MockLLMProvider()
 
 app.add_middleware(
@@ -39,6 +42,8 @@ app.add_middleware(
 
 @app.exception_handler(BusinessError)
 def handle_business_error(request: Request, error: BusinessError) -> JSONResponse:
+    """把业务异常转换成客户端统一响应信封。"""
+
     return JSONResponse(envelope(None, code=error.code, msg=error.msg))
 
 
@@ -60,6 +65,8 @@ def health() -> dict:
 
 @app.post("/oauth2/login")
 def login(payload: LoginRequest, session: Session = Depends(get_session)) -> dict:
+    """账号密码登录，成功后签发 access/refresh token。"""
+
     user = session.exec(select(User).where(User.username == payload.name)).first()
     if user is None or user.password != payload.pwd:
         raise BusinessError(401, "Invalid username or password.")
@@ -69,6 +76,8 @@ def login(payload: LoginRequest, session: Session = Depends(get_session)) -> dic
 
 @app.get("/oauth2/refresh")
 def refresh_token(refreshToken: str, session: Session = Depends(get_session)) -> dict:
+    """使用 refresh token 换取新会话，并撤销旧 refresh token。"""
+
     token = session.exec(
         select(SessionToken).where(SessionToken.refresh_token == refreshToken)
     ).first()
@@ -78,6 +87,7 @@ def refresh_token(refreshToken: str, session: Session = Depends(get_session)) ->
     user = session.get(User, token.user_id)
     if user is None:
         raise BusinessError(401, "Invalid session.")
+    # refresh token 采用一次性轮换策略，降低旧 token 泄露后的可用窗口。
     token.revoked_at = datetime.utcnow()
     session.add(token)
     new_token = issue_session_tokens(session, user)
@@ -89,6 +99,8 @@ def logout(
     request: Request,
     session: Session = Depends(get_session),
 ) -> dict:
+    """退出登录时撤销当前 access token。"""
+
     auth_header = request.headers.get("authorization") or request.headers.get("Authorization") or ""
     access_token = auth_header.replace("Bearer ", "", 1).strip()
     if access_token:
@@ -104,6 +116,8 @@ def logout(
 
 @app.get("/oauth2/getUserInfo")
 def get_user_info(user: User = Depends(get_current_user)) -> dict:
+    """返回当前登录用户资料。"""
+
     return envelope(
         {
             "id": user.id,
@@ -120,6 +134,8 @@ def update_password(
     user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
 ) -> dict:
+    """修改当前用户密码。"""
+
     if user.password != payload.oldPwd:
         raise BusinessError(400, "Old password is incorrect.")
     user.password = payload.newPwd
@@ -130,11 +146,15 @@ def update_password(
 
 @app.get("/oauth2/menuTree")
 def menu_tree(user: User = Depends(get_current_user)) -> dict:
+    """菜单树占位接口，保持和现有客户端契约兼容。"""
+
     return envelope([])
 
 
 @app.get("/chat/template")
 def chat_template(user: User = Depends(get_current_user)) -> dict:
+    """返回首页推荐问题。"""
+
     return envelope(
         {
             "questions": [
@@ -155,6 +175,8 @@ def chat_function(
     user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
 ) -> dict:
+    """处理一次聊天问题：创建/续写历史、调用函数识别，并写入助手回复。"""
+
     now = datetime.utcnow()
     record = None
     if historyId is not None:
@@ -163,6 +185,7 @@ def chat_function(
             record = None
 
     if record is None:
+        # 首次提问时创建会话，标题取问题前 40 个字符。
         record = HistoryRecord(
             name=question[:40] or "新对话",
             create_id=user.id or 0,
@@ -189,6 +212,7 @@ def chat_function(
 
     result = llm_provider.analyze(question, record.id or 0)
     if result["hasTool"]:
+        # 工具调用结果在历史里存为图表 JSON，客户端按 contentType=2 解码。
         chart_payload = chart_detail(result.get("name"))
         assistant_detail = HistoryDetail(
             history_id=record.id or 0,
@@ -199,6 +223,7 @@ def chat_function(
             update_time=now,
         )
     else:
+        # 非工具回答存为普通文本类历史；这里保留完整 JSON，便于客户端复用 msg 等字段。
         assistant_detail = HistoryDetail(
             history_id=record.id or 0,
             type="2",
@@ -216,6 +241,7 @@ def chat_function(
     session.refresh(assistant_detail)
 
     if result["hasTool"]:
+        # 图表历史明细 id 只有写库后才生成，回填到图表 payload 供点赞接口使用。
         chart_payload["historyDetailId"] = assistant_detail.id
         assistant_detail.content = compact_json(chart_payload)
         session.add(assistant_detail)
@@ -226,6 +252,8 @@ def chat_function(
 
 @app.get("/stream")
 def stream(question: str, user: User = Depends(get_current_user)) -> StreamingResponse:
+    """SSE 流式文本接口，作为结构化函数调用失败时的兜底回答。"""
+
     def events():
         for chunk in llm_provider.stream(question):
             yield "data: " + chunk + "\n\n"
@@ -240,6 +268,8 @@ def stream(question: str, user: User = Depends(get_current_user)) -> StreamingRe
 
 @app.get("/chart/{function_name}")
 def chart(function_name: str, historyId: int, user: User = Depends(get_current_user)) -> dict:
+    """按函数名返回图表详情；historyId 会透传为 historyDetailId 兼容客户端字段。"""
+
     payload = chart_detail(function_name)
     payload["historyDetailId"] = historyId
     return envelope(payload)
@@ -252,8 +282,11 @@ def history_page(
     user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
 ) -> dict:
+    """分页返回当前用户未删除的历史会话。"""
+
     page = max(currentPage, 1)
     size = max(min(pageSize, 100), 1)
+    # 当前数据量很小，先内存分页；如果历史量变大可改为 SQL offset/limit。
     statement = (
         select(HistoryRecord)
         .where(HistoryRecord.create_id == (user.id or 0))
@@ -282,6 +315,8 @@ def history_detail(
     user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
 ) -> dict:
+    """返回指定会话及其明细列表。"""
+
     record = session.get(HistoryRecord, historyId)
     if record is None or record.deleted_at is not None or record.create_id != user.id:
         raise BusinessError(404, "History not found.")
@@ -299,6 +334,8 @@ def like_history(
     user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
 ) -> dict:
+    """更新历史回答的点赞/点踩状态。"""
+
     detail = session.get(HistoryDetail, payload.historyDetailId)
     if detail is None:
         raise BusinessError(404, "History detail not found.")
@@ -318,6 +355,8 @@ def delete_history(
     user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
 ) -> dict:
+    """软删除单个历史会话。"""
+
     record = session.get(HistoryRecord, historyId)
     if record is not None and record.create_id == user.id:
         record.deleted_at = datetime.utcnow()
@@ -331,6 +370,8 @@ def delete_all_history(
     user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
 ) -> dict:
+    """软删除当前用户所有历史会话。"""
+
     records = session.exec(
         select(HistoryRecord)
         .where(HistoryRecord.create_id == (user.id or 0))
@@ -349,6 +390,8 @@ def serialize_history_record(
     include_details: bool,
     details: Optional[List[HistoryDetail]] = None,
 ) -> dict:
+    """将 HistoryRecord 转为前端契约字段。"""
+
     payload = {
         "id": record.id,
         "name": record.name,
@@ -365,6 +408,8 @@ def serialize_history_record(
 
 
 def serialize_history_detail(detail: HistoryDetail) -> dict:
+    """将 HistoryDetail 转为前端契约字段。"""
+
     return {
         "id": detail.id,
         "historyId": detail.history_id,
@@ -378,4 +423,6 @@ def serialize_history_detail(detail: HistoryDetail) -> dict:
 
 
 def format_time(value: datetime) -> str:
+    """统一输出前端当前可解析的日期时间格式。"""
+
     return value.strftime("%Y-%m-%d %H:%M:%S")

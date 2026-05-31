@@ -6,6 +6,8 @@ from .config import get_settings
 
 
 class LLMProvider(Protocol):
+    """LLM 提供方协议，便于未来把本地 mock 替换成真实模型服务。"""
+
     def analyze(self, question: str, history_id: int) -> Dict:
         ...
 
@@ -14,12 +16,13 @@ class LLMProvider(Protocol):
 
 
 class MockLLMProvider:
+    """基于关键字和 Apifox 夹具的本地模拟 LLM。"""
+
     def analyze(self, question: str, history_id: int) -> Dict:
         fixture_result = load_function_fixture(question)
         if fixture_result is not None:
             result = dict(fixture_result)
-            # Keep the local conversation flow coherent while preserving the
-            # Apifox function name, msg, and arguments.
+            # 使用真实会话 id 覆盖夹具里的 historyId，让本地会话链路保持一致。
             result["historyId"] = history_id
             return result
 
@@ -63,6 +66,8 @@ class MockLLMProvider:
 
 
 def chart_detail(function_name: Optional[str] = None) -> Dict:
+    """返回指定函数的图表详情，优先使用 Apifox 夹具，缺失时返回默认折线数据。"""
+
     fixture_payload = load_chart_fixture(function_name)
     if fixture_payload is not None:
         return fixture_payload
@@ -81,6 +86,8 @@ def chart_detail(function_name: Optional[str] = None) -> Dict:
 
 
 def compact_json(payload: Dict) -> str:
+    """压缩 JSON 字符串，保持中文原文，便于写入历史 content 字段。"""
+
     return json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
 
 
@@ -102,6 +109,8 @@ CHART_FIXTURES = {
 
 
 def load_function_fixture(question: str) -> Optional[Dict]:
+    """按用户问题命中函数识别夹具。"""
+
     path = match_function_fixture(question)
     if path is None:
         return None
@@ -111,6 +120,8 @@ def load_function_fixture(question: str) -> Optional[Dict]:
 
 
 def match_function_fixture(question: str) -> Optional[Path]:
+    """通过关键字全量匹配选择最接近的 Apifox 函数夹具。"""
+
     normalized = normalize_text(question)
     for keywords, filename in FUNCTION_FIXTURES:
         if all(normalize_text(keyword) in normalized for keyword in keywords):
@@ -119,6 +130,8 @@ def match_function_fixture(question: str) -> Optional[Path]:
 
 
 def load_chart_fixture(function_name: Optional[str]) -> Optional[Dict]:
+    """按函数名读取对应图表夹具。"""
+
     if not function_name:
         return None
     filename = CHART_FIXTURES.get(function_name)
@@ -130,6 +143,8 @@ def load_chart_fixture(function_name: Optional[str]) -> Optional[Dict]:
 
 
 def load_json_payload(path: Path) -> Optional[Any]:
+    """安全读取 JSON 夹具，文件缺失或为空时返回 None。"""
+
     if not path.exists():
         return None
     raw = path.read_text(encoding="utf-8").strip()
@@ -139,10 +154,14 @@ def load_json_payload(path: Path) -> Optional[Any]:
 
 
 def unwrap_envelope(payload: Optional[Any]) -> Optional[Any]:
+    """兼容 Apifox 的统一响应信封，取出 data 作为业务 payload。"""
+
     if isinstance(payload, dict) and "code" in payload and "data" in payload:
         return payload.get("data")
     return payload
 
 
 def normalize_text(value: str) -> str:
+    """归一化问题文本，降低标点和大小写对关键字匹配的影响。"""
+
     return value.lower().replace("？", "").replace("?", "").replace("，", "").replace(",", "").strip()

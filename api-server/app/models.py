@@ -4,6 +4,8 @@ from sqlmodel import Field, SQLModel
 
 
 class User(SQLModel, table=True):
+    """本地演示用户表。"""
+
     id: Optional[int] = Field(default=None, primary_key=True)
     username: str = Field(index=True, unique=True)
     password: str
@@ -14,6 +16,8 @@ class User(SQLModel, table=True):
 
 
 class SessionToken(SQLModel, table=True):
+    """访问令牌和刷新令牌表，支持过期判断和主动撤销。"""
+
     id: Optional[int] = Field(default=None, primary_key=True)
     user_id: int = Field(foreign_key="user.id", index=True)
     access_token: str = Field(index=True, unique=True)
@@ -25,6 +29,8 @@ class SessionToken(SQLModel, table=True):
 
 
 class HistoryRecord(SQLModel, table=True):
+    """一次聊天会话记录，deleted_at 用于软删除。"""
+
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str
     create_id: int = Field(foreign_key="user.id", index=True)
@@ -37,6 +43,8 @@ class HistoryRecord(SQLModel, table=True):
 
 
 class HistoryDetail(SQLModel, table=True):
+    """会话中的单条明细，type/content_type 沿用前端和 Apifox 契约枚举。"""
+
     id: Optional[int] = Field(default=None, primary_key=True)
     history_id: int = Field(foreign_key="historyrecord.id", index=True)
     type: str

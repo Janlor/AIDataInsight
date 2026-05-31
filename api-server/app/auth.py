@@ -15,6 +15,8 @@ REFRESH_TOKEN_SECONDS = 60 * 60 * 24 * 7
 
 
 def issue_session_tokens(session: Session, user: User) -> SessionToken:
+    """签发一组新的 access/refresh token，并持久化到数据库。"""
+
     now = datetime.utcnow()
     token = SessionToken(
         user_id=user.id or 0,
@@ -30,6 +32,8 @@ def issue_session_tokens(session: Session, user: User) -> SessionToken:
 
 
 def token_payload(user: User, token: SessionToken) -> dict:
+    """生成登录响应体，同时返回蛇形和驼峰字段以兼容不同客户端。"""
+
     return {
         "access_token": token.access_token,
         "refresh_token": token.refresh_token,
@@ -46,6 +50,8 @@ def token_payload(user: User, token: SessionToken) -> dict:
 
 
 def read_bearer_token(request: Request) -> Optional[str]:
+    """从 Authorization 头读取 Bearer token。"""
+
     value = request.headers.get("authorization") or request.headers.get("Authorization")
     if not value:
         return None
@@ -59,6 +65,8 @@ def get_current_user(
     request: Request,
     session: Session = Depends(get_session),
 ) -> User:
+    """FastAPI 依赖：校验 access token 并返回当前用户。"""
+
     access_token = read_bearer_token(request)
     if not access_token:
         raise BusinessError(401, "Missing access token.")
@@ -69,6 +77,7 @@ def get_current_user(
     if token is None or token.revoked_at is not None:
         raise BusinessError(401, "Invalid session.")
     if token.access_expires_at < datetime.utcnow():
+        # 402 是本项目客户端约定的 access token 过期码，客户端收到后会尝试刷新 token。
         raise BusinessError(402, "Access token expired.")
 
     user = session.get(User, token.user_id)

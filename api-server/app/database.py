@@ -17,11 +17,14 @@ DEMO_PASSWORD = "demo@123"
 
 
 def get_engine():
+    """惰性创建 SQLModel engine，测试可通过 override 切换数据库。"""
+
     global _engine
     if _engine is None:
         settings = get_settings()
         database_url = _database_url_override or settings.database_url
         if database_url.startswith("sqlite:///"):
+            # 本地 SQLite 数据库目录不存在时自动创建，便于首次启动。
             db_path = Path(database_url.replace("sqlite:///", "", 1))
             db_path.parent.mkdir(parents=True, exist_ok=True)
         connect_args = {"check_same_thread": False} if database_url.startswith("sqlite") else {}
@@ -30,6 +33,8 @@ def get_engine():
 
 
 def reset_engine_for_tests(database_url: str, fixtures_dir: Optional[Path] = None) -> None:
+    """测试辅助函数：重置 engine 并切换数据库/夹具目录。"""
+
     global _engine, _database_url_override, _fixtures_dir_override
     _database_url_override = database_url
     _fixtures_dir_override = fixtures_dir
@@ -37,15 +42,21 @@ def reset_engine_for_tests(database_url: str, fixtures_dir: Optional[Path] = Non
 
 
 def create_db_and_tables() -> None:
+    """根据 SQLModel 元数据创建所有表。"""
+
     SQLModel.metadata.create_all(get_engine())
 
 
 def get_session() -> Generator[Session, None, None]:
+    """FastAPI 数据库会话依赖。"""
+
     with Session(get_engine()) as session:
         yield session
 
 
 def seed_development_data(session: Session) -> None:
+    """写入本地开发所需的 demo 用户和初始历史数据。"""
+
     user = session.exec(select(User).where(User.username == DEMO_USERNAME)).first()
     if user is None:
         user = User(
@@ -66,10 +77,12 @@ def seed_development_data(session: Session) -> None:
 
     history_count = len(session.exec(select(HistoryRecord)).all())
     if history_count > 0:
+        # 数据库已有历史记录时不重复导入，避免每次启动都膨胀数据。
         return
 
     imported_count = seed_apifox_history_fixtures(session, user)
     if imported_count > 0:
+        # 优先使用 Apifox 导出的真实 mock 数据，缺失时再写入极简兜底数据。
         return
 
     now = datetime.utcnow()
@@ -141,6 +154,8 @@ def seed_development_data(session: Session) -> None:
 
 
 def seed_apifox_history_fixtures(session: Session, user: User) -> int:
+    """从 Apifox mock 目录导入历史分页和详情夹具。"""
+
     fixtures_dir = _fixtures_dir_override or get_settings().fixtures_dir
     if not fixtures_dir.exists():
         return 0
@@ -169,6 +184,8 @@ def seed_apifox_history_fixtures(session: Session, user: User) -> int:
 
 
 def load_fixture_payload(path: Path) -> Optional[Any]:
+    """读取单个夹具文件，空文件或不存在时返回 None。"""
+
     if not path.exists():
         return None
     raw = path.read_text(encoding="utf-8").strip()
@@ -181,12 +198,16 @@ def load_fixture_payload(path: Path) -> Optional[Any]:
 
 
 def unwrap_envelope(payload: Any) -> Any:
+    """如果夹具是统一响应信封，则取出 data 字段。"""
+
     if isinstance(payload, dict) and "data" in payload and "code" in payload:
         return payload.get("data")
     return payload
 
 
 def extract_records(payload: Optional[Any]) -> List[Dict[str, Any]]:
+    """从分页信封、列表或普通 payload 中提取历史记录数组。"""
+
     if payload is None:
         return []
     data = unwrap_envelope(payload)
@@ -202,6 +223,8 @@ def upsert_history_record(
     user: User,
     payload: Any,
 ) -> Optional[HistoryRecord]:
+    """按远端历史 id 新增或更新会话记录。"""
+
     if not isinstance(payload, dict):
         return None
 
@@ -241,6 +264,8 @@ def replace_history_details(
     history_id: int,
     details_payload: List[Any],
 ) -> None:
+    """用夹具中的明细完整替换指定会话的本地明细。"""
+
     existing_details = session.exec(
         select(HistoryDetail).where(HistoryDetail.history_id == history_id)
     ).all()
@@ -254,6 +279,7 @@ def replace_history_details(
         if content is None:
             content = ""
         elif not isinstance(content, str):
+            # 图表内容可能是对象，存入历史表前压成 JSON 字符串供客户端解码。
             content = json.dumps(content, ensure_ascii=False, separators=(",", ":"))
 
         detail_id = detail_payload.get("id")
@@ -271,6 +297,8 @@ def replace_history_details(
 
 
 def infer_history_name(payload: Dict[str, Any]) -> Optional[str]:
+    """没有会话名时，从第一条用户问题推断历史标题。"""
+
     details = payload.get("detailList")
     if not isinstance(details, list):
         return None
@@ -281,6 +309,8 @@ def infer_history_name(payload: Dict[str, Any]) -> Optional[str]:
 
 
 def parse_time(value: Any) -> Optional[datetime]:
+    """兼容 Apifox 夹具中出现的多种日期格式。"""
+
     if not isinstance(value, str) or not value.strip():
         return None
     text = value.strip()

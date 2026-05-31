@@ -1,4 +1,5 @@
 import AppContracts
+import AppCore
 import AppDesignSystem
 import AppNetworking
 import Foundation
@@ -85,7 +86,10 @@ public struct RemoteHistoryRepository: HistoryRepository {
             ]),
             as: RecordPageContract.self
         )
-        return envelope.data ?? RecordPageContract(currentPage: currentPage, pageSize: pageSize, total: 0, pages: 0, cacheKey: nil, records: [])
+        guard let page = envelope.data else {
+            throw AppError(kind: .dataFormat, traceID: envelope.trace, transactionID: envelope.tid)
+        }
+        return page
     }
 
     public func deleteHistory(historyId: Int) async throws {
@@ -133,8 +137,7 @@ public final class HistoryStore {
     }
 
     public func retryLoading() async {
-        let nextPage = conversations.isEmpty ? 1 : state.currentPage + 1
-        await load(page: nextPage, replacing: conversations.isEmpty)
+        await loadFirstPage()
     }
 
     public func loadNextPageIfNeeded(currentItemID: String?) async {
@@ -352,6 +355,13 @@ public struct HistorySidebar: View {
                         .listRowBackground(AppColor.GroupedBackground.primary.color)
                 }
 
+                if store.state.isLoading == false,
+                   store.state.errorMessage == nil,
+                   store.conversations.isEmpty {
+                    emptyRow
+                        .listRowBackground(AppColor.GroupedBackground.primary.color)
+                }
+
                 ForEach(store.state.groups) { group in
                     Section(group.title) {
                         ForEach(group.conversations) { conversation in
@@ -452,6 +462,14 @@ public struct HistorySidebar: View {
             .accessibilityIdentifier("history-retry-button")
         }
         .padding(.vertical, 6)
+    }
+
+    private var emptyRow: some View {
+        Text("暂无历史记录")
+            .font(.footnote)
+            .foregroundStyle(AppColor.Label.secondary.color)
+            .padding(.vertical, 6)
+            .accessibilityIdentifier("history-empty-row")
     }
 
     private func row(_ conversation: HistoryConversationViewState) -> some View {

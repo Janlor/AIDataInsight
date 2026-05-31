@@ -58,6 +58,31 @@ import Foundation
 }
 
 @MainActor
+@Test func historyStoreRetryReloadsFirstPage() async {
+    let repository = PagedHistoryRepository()
+    let store = HistoryStore(
+        state: HistoryViewState(
+            groups: [
+                HistoryGroupViewState(
+                    id: .today,
+                    title: "今天",
+                    conversations: [
+                        HistoryConversationViewState(id: "1", remoteID: 1, title: "Existing", updatedAt: .now),
+                    ]
+                ),
+            ],
+            currentPage: 1
+        ),
+        repository: repository
+    )
+
+    await store.retryLoading()
+
+    #expect(await repository.requestedPages == [1])
+    #expect(store.conversations.map(\.title) == ["First Page"])
+}
+
+@MainActor
 @Test func historyStoreKeepsRecordsWithoutTimestamp() async {
     let store = HistoryStore(repository: StaticHistoryRepository(records: [
         HistoryRecordContract(id: 9, name: "Untimed", detailList: nil),
@@ -119,4 +144,26 @@ private actor FlakyHistoryRepository: HistoryRepository {
 
 private enum TestError: Error {
     case loadFailed
+}
+
+private actor PagedHistoryRepository: HistoryRepository {
+    private(set) var requestedPages: [Int] = []
+
+    func loadHistoryPage(currentPage: Int, pageSize: Int) async throws -> RecordPageContract {
+        requestedPages.append(currentPage)
+        return RecordPageContract(
+            currentPage: currentPage,
+            pageSize: pageSize,
+            total: 1,
+            pages: 1,
+            cacheKey: nil,
+            records: [
+                HistoryRecordContract(id: 11, name: "First Page", updateTime: ISO8601DateFormatter().string(from: .now), detailList: nil),
+            ]
+        )
+    }
+
+    func deleteHistory(historyId: Int) async throws {}
+
+    func deleteAllHistory() async throws {}
 }

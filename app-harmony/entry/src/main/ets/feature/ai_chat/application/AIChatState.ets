@@ -16,6 +16,7 @@ export const aiChatWelcomeIntro = '你好，我是你的AI数据分析助手。�
 export const aiChatWelcomePrompt = '你也可以尝试点击以下推荐问题：'
 export const aiChatInputPlaceholder = '请输入您的数据分析查询。'
 
+// UI 层额外的消息类型，包含本地 loading/error 状态。
 export enum AIChatMessageContentKind {
   Welcome = 'welcome',
   Text = 'text',
@@ -54,6 +55,7 @@ export interface AIChatUiState {
 }
 
 export function initialAIChatUiState(): AIChatUiState {
+  // 初始状态不立即放欢迎消息，等待模板问题加载后再构造欢迎态。
   return buildAIChatUiState(null, new Array<AIChatMessageUiModel>(), new Array<string>(), '', false, false, false, null, false)
 }
 
@@ -69,6 +71,7 @@ export function buildAIChatUiState(
   scrollToBottom: boolean
 ): AIChatUiState {
   let normalizedInput = inputText.trim()
+  // canSend/canClear 是派生状态，统一在这里计算，页面层只负责渲染。
   return {
     historyId: historyId,
     messages: messages,
@@ -85,6 +88,7 @@ export function buildAIChatUiState(
 }
 
 export function makeWelcomeMessage(templateQuestions: Array<string>): AIChatMessageUiModel {
+  // 欢迎消息携带推荐问题，页面可直接渲染为快捷入口。
   return {
     id: 'local-welcome',
     role: ConversationRole.Assistant,
@@ -121,6 +125,7 @@ export function makeLoadingMessage(id: string): AIChatMessageUiModel {
 }
 
 export function mapConversationMessages(messages: Array<ConversationMessage>): Array<AIChatMessageUiModel> {
+  // 历史详情回放时，把跨端契约消息转换成 Harmony 页面模型。
   return messages.map((message: ConversationMessage): AIChatMessageUiModel => {
     return {
       id: message.id,
@@ -155,6 +160,7 @@ export function replaceLastMessage(
   messages: Array<AIChatMessageUiModel>,
   replacement: AIChatMessageUiModel
 ): Array<AIChatMessageUiModel> {
+  // 发送过程中最后一条通常是 loading，占位消息返回后用真实结果替换。
   let updated = messages.slice()
   if (updated.length === 0) {
     updated.push(replacement)
@@ -169,6 +175,7 @@ export function updateMessageFeedback(
   historyDetailId: number,
   feedback: FeedbackState
 ): Array<AIChatMessageUiModel> {
+  // 点赞/点踩只更新匹配 historyDetailId 的助手消息。
   return messages.map((message: AIChatMessageUiModel): AIChatMessageUiModel => {
     if (message.historyDetailId !== historyDetailId) {
       return message

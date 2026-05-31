@@ -7,6 +7,7 @@ export interface ApiEnvelope<T> {
 }
 
 export function requireEnvelopeData<T>(envelope: ApiEnvelope<T>): T {
+  // 业务接口声明有 data 时，空值视为契约异常。
   if (envelope.data === null || envelope.data === undefined) {
     throw new Error('ApiEnvelope data is empty')
   }

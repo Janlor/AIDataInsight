@@ -9,6 +9,7 @@ export class MockHttpTransport implements HttpTransport {
   }
 
   register(path: string, responseText: string): void {
+    // 测试中按 path 注册完整响应文本，便于复用 CommonRequester 的信封解析。
     this.responses.set(path, responseText)
   }
 

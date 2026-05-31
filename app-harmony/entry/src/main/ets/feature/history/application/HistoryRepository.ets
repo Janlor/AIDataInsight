@@ -1,6 +1,7 @@
 import { HistoryRecord, RecordPage } from '../../../core/model/ContractModelExports'
 import { CommonRequester, HttpMethod } from '../../../core/network/CommonRequester'
 
+// 历史仓库抽象，页面只关心会话列表，不关心远端分页信封。
 export interface HistoryRepository {
   loadHistoryPage(currentPage: number, pageSize: number): Promise<Array<HistoryRecord>>
 }
@@ -13,6 +14,7 @@ export class RemoteHistoryRepository implements HistoryRepository {
   }
 
   async loadHistoryPage(currentPage: number, pageSize: number): Promise<Array<HistoryRecord>> {
+    // 当前页面只使用 records；分页元信息暂不进入 UI 状态。
     let page = await this.requester.request<RecordPage>({
       path: `/history/page?currentPage=${currentPage}&pageSize=${pageSize}`,
       method: HttpMethod.Get
@@ -23,6 +25,7 @@ export class RemoteHistoryRepository implements HistoryRepository {
 
 export class MockHistoryRepository implements HistoryRepository {
   async loadHistoryPage(currentPage: number, pageSize: number): Promise<Array<HistoryRecord>> {
+    // Mock 忽略分页参数，返回稳定样例数据用于预览和测试。
     return mockHistoryRecords()
   }
 }
@@ -56,6 +59,7 @@ export function mockHistoryRecords(): Array<HistoryRecord> {
 }
 
 function todayString(): string {
+  // 动态生成今天和本月数据，保证分组测试不过期。
   let now = new Date()
   let month = twoDigits(now.getMonth() + 1)
   let day = twoDigits(now.getDate())

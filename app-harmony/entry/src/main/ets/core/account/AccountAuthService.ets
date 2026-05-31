@@ -19,6 +19,7 @@ class LoginApiRequest {
   }
 }
 
+// 登录响应兼容后端可能返回的驼峰和蛇形 token 字段。
 interface LoginPayload {
   accessToken?: string | null
   refreshToken?: string | null
@@ -54,6 +55,7 @@ export class AccountAuthService {
       isLogin: true
     }
 
+    // 登录成功后先清空旧用户资料，再保存新会话并静默刷新当前用户。
     await this.userStore.clear()
     await this.sessionStore.save(session)
     await this.refreshUserInfoSilently()
@@ -80,6 +82,7 @@ export class AccountAuthService {
     } catch (error) {
       if (error instanceof ApiError &&
         (error.kind === ApiErrorKind.Unauthorized || error.kind === ApiErrorKind.TokenExpired)) {
+        // 认证失效时清理受保护账号状态，避免页面继续使用过期身份。
         await this.clearProtectedAccountState()
       }
       throw this.normalizedError(error)
@@ -90,6 +93,7 @@ export class AccountAuthService {
     try {
       await this.getUserInfo()
     } catch (error) {
+      // 用户资料只影响展示名，登录主流程不因资料刷新失败而中断。
     }
   }
 
@@ -110,6 +114,7 @@ export class AccountAuthService {
     let session = await this.sessionStore.load()
     let headers = new Map<string, string>()
     if (session.accessToken !== null && session.accessToken !== undefined && session.accessToken.length > 0) {
+      // 与 Web/Android/iOS 保持一致，使用 Bearer token。
       headers.set('Authorization', `Bearer ${session.accessToken}`)
     }
     return headers

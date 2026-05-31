@@ -28,6 +28,7 @@ export interface ApiEnvelope<T> {
 }
 
 export interface LoginPayload {
+  // 兼容后端登录接口的蛇形和驼峰 token 字段。
   accessToken?: string | null
   refreshToken?: string | null
   access_token?: string | null
@@ -42,6 +43,7 @@ export interface LoginMappingOutput {
 }
 
 export function mapLoginResponse(response: ApiEnvelope<LoginPayload>): LoginMappingOutput {
+  // 登录响应映射为会话，同时给导航层一个打开首页的意图。
   let data = response.data
   return {
     session: {
@@ -57,12 +59,14 @@ export function mapLoginResponse(response: ApiEnvelope<LoginPayload>): LoginMapp
 
 export function normalizeTemplateQuestionSet(data: string | TemplateQuestionSet): TemplateQuestionSet {
   if (typeof data === 'string') {
+    // Apifox mock 可能把推荐问题集合包成 JSON 字符串。
     return JSON.parse(data) as TemplateQuestionSet
   }
   return data
 }
 
 export function mapHistoryDetailsToMessages(details: Array<HistoryDetail>): Array<ConversationMessage> {
+  // 历史明细统一转换为跨端聊天消息，页面再映射成 UI 模型。
   return details.map((detail: HistoryDetail): ConversationMessage => {
     if (detail.type === HistoryDetailType.Question) {
       return {
@@ -76,6 +80,7 @@ export function mapHistoryDetailsToMessages(details: Array<HistoryDetail>): Arra
     }
 
     if (detail.contentType === HistoryContentType.Chart) {
+      // 图表历史内容以 JSON 字符串保存，需要恢复成图表 payload。
       let chartDetail = JSON.parse(detail.content ?? '{}') as RawHistoryChartDetail
       let chartPayload = mapRawChartPayload(chartDetail)
       return {
@@ -104,6 +109,7 @@ export function mapHistoryDetailsToMessages(details: Array<HistoryDetail>): Arra
 export function mapChartPayload(detail: HistoryChartDetail): ChartPayload {
   let functionName = detail.funcType ?? null
   let series = (detail.chartCommonVoList ?? []).map((item: ChartCommonItem): ChartSeries => {
+    // 普通图表每个数据项映射为单点 series，方便 ArkUI 简单渲染。
     let label = item.name ?? ''
     return {
       xAxis: label,
@@ -112,6 +118,7 @@ export function mapChartPayload(detail: HistoryChartDetail): ChartPayload {
     }
   })
   if (series.length === 0) {
+    // 账龄图表自带 label/value 数组，按每个分组生成 series。
     series = (detail.accountAgeGroupVoList ?? []).map((item: AccountAgeGroupItem): ChartSeries => {
       return {
         xAxis: item.name ?? '',
@@ -160,6 +167,7 @@ function feedbackFromLike(value?: string | null): FeedbackState {
 }
 
 function chartUnitForFunctionName(name?: FunctionName | null): ChartUnit {
+  // 库存类接口以吨为单位，其它经营分析默认按金额展示。
   if (name === FunctionName.QueryStockGroupByOrg || name === FunctionName.QueryStockGroupByWarehouse) {
     return ChartUnit.Ton
   }

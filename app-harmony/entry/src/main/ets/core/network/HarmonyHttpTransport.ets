@@ -6,6 +6,7 @@ export class HarmonyHttpTransport implements HttpTransport {
   async send(request: ResolvedApiRequest): Promise<string> {
     let httpRequest = http.createHttp()
     try {
+      // Harmony 原生 http 接口返回的 result 可能是字符串、对象或 ArrayBuffer，后面统一转文本。
       let response = await (httpRequest.request(request.url, {
         method: this.requestMethod(request.method),
         header: this.headers(request),
@@ -25,6 +26,7 @@ export class HarmonyHttpTransport implements HttpTransport {
       }
       throw new ApiError(ApiErrorKind.Transport, `网络请求失败: ${JSON.stringify(error)}`)
     } finally {
+      // 每次请求结束都销毁 http 实例，避免底层资源泄露。
       httpRequest.destroy()
     }
   }
@@ -41,6 +43,7 @@ export class HarmonyHttpTransport implements HttpTransport {
       'content-type': 'application/json'
     }
     if (request.headers !== undefined) {
+      // 业务请求可覆盖或追加认证、SSE 等特殊 header。
       request.headers.forEach((value: string, key: string) => {
         headers[key] = value
       })
@@ -55,6 +58,7 @@ export class HarmonyHttpTransport implements HttpTransport {
     if (typeof request.body === 'string') {
       return request.body
     }
+    // ArkTS http extraData 支持对象或字符串，这里统一序列化以匹配后端 JSON 接口。
     return JSON.stringify(request.body)
   }
 
@@ -69,6 +73,7 @@ export class HarmonyHttpTransport implements HttpTransport {
   }
 
   private arrayBufferToString(buffer: ArrayBuffer): string {
+    // 当前接口返回 UTF-8 文本；这里做轻量转换，避免引入额外解码依赖。
     let bytes = new Uint8Array(buffer)
     let text = ''
     for (let index = 0; index < bytes.length; index++) {

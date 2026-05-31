@@ -19,12 +19,14 @@ export struct AIHomePage {
 
   aboutToAppear() {
     if (this.openHistoryVersion > 0) {
+      // 外部传入版本号时，进入首页后自动打开历史抽屉。
       this.openHistoryPanel()
     }
   }
 
   private onOpenHistoryVersionChanged(): void {
     if (this.openHistoryVersion > 0) {
+      // 设置页返回后通过版本号触发历史抽屉刷新和打开。
       this.openHistoryPanel()
     }
   }
@@ -55,6 +57,7 @@ export struct AIHomePage {
             this.dragStartProgress = this.drawerProgress
           })
           .onActionUpdate((event: GestureEvent) => {
+            // 主内容区域也接收横向拖动，支持从页面内滑出历史抽屉。
             this.handleDrawerDrag(event as PanGestureEvent)
           })
           .onActionEnd((event: GestureEvent) => {
@@ -109,6 +112,7 @@ export struct AIHomePage {
       }
 
       if (this.drawerProgress === 0) {
+        // 抽屉关闭时保留左侧热区，便于从屏幕边缘滑出历史面板。
         Row()
           .width(24)
           .height('100%')
@@ -166,6 +170,7 @@ export struct AIHomePage {
         .padding({ left: 12, right: 12, top: 8, bottom: 8 })
         .onClick(() => {
           this.selectedHistoryId = null
+          // conversationVersion 变化会让 AIChatPage 重置为新会话。
           this.conversationVersion += 1
         })
     }
@@ -192,6 +197,7 @@ export struct AIHomePage {
       this.isHistoryMounted = true
     }
     if (this.drawerProgress === 0) {
+      // 每次从关闭态打开抽屉时刷新历史列表。
       this.historyRefreshVersion += 1
     }
   }
@@ -207,6 +213,7 @@ export struct AIHomePage {
   }
 
   private settleDrawer(event: PanGestureEvent): void {
+    // 根据速度和当前位置决定最终打开或关闭，手感接近系统抽屉。
     let shouldOpen = event.velocityX > 500 || (event.velocityX > -500 && this.drawerProgress >= 0.5)
     this.getUIContext().animateTo({ duration: 160, curve: Curve.EaseOut }, () => {
       this.drawerProgress = shouldOpen ? 1 : 0
@@ -216,6 +223,7 @@ export struct AIHomePage {
   private historyPanelWidth(): number {
     let width = this.pageWidth > 0 ? this.pageWidth : 390
     if (width >= 600) {
+      // 宽屏固定侧栏宽度，窄屏使用 86% 宽度。
       return 320
     }
     return Math.min(360, Math.round(width * 0.86))

@@ -2,6 +2,7 @@ import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { AccountSession } from '../model/ContractModelExports'
 
+// 空会话作为所有读取失败或退出登录后的统一状态。
 export const emptyAccountSession: AccountSession = {
   accessToken: null,
   refreshToken: null,
@@ -16,6 +17,7 @@ export interface AccountSessionStore {
   clear(): Promise<void>
 }
 
+// 单元测试和预览用的内存会话存储。
 export class MemoryAccountSessionStore implements AccountSessionStore {
   private session: AccountSession
 
@@ -41,6 +43,7 @@ export class PreferencesAccountSessionStore implements AccountSessionStore {
   private cachedPreferences: preferences.Preferences | null = null
 
   configure(context: common.UIAbilityContext): void {
+    // context 变化时丢弃旧 Preferences 实例，确保读取的是当前 Ability 环境。
     this.context = context
     this.cachedPreferences = null
   }
@@ -48,6 +51,7 @@ export class PreferencesAccountSessionStore implements AccountSessionStore {
   async load(): Promise<AccountSession> {
     try {
       let storage = this.preferences()
+      // Preferences 只支持基础值，读取后统一恢复成 AccountSession。
       return {
         accessToken: this.optionalString(storage.getSync('accessToken', '')),
         refreshToken: this.optionalString(storage.getSync('refreshToken', '')),
@@ -89,6 +93,7 @@ export class PreferencesAccountSessionStore implements AccountSessionStore {
       return this.cachedPreferences
     }
     if (this.context === null) {
+      // 调用方必须先通过 configureAppServices 注入 Ability context。
       throw new Error('PreferencesAccountSessionStore must be configured before use.')
     }
     try {
@@ -115,6 +120,7 @@ export class PreferencesAccountSessionStore implements AccountSessionStore {
 }
 
 export function shouldAutoLogin(session: AccountSession): boolean {
+  // 当前只要 isLogin=true 且 accessToken 存在，就允许启动进入主界面。
   return session.isLogin === true && hasText(session.accessToken)
 }
 

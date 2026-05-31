@@ -1,5 +1,6 @@
 export const privacyPolicyTitle: string = '隐私政策'
 
+// 当前隐私内容为本地静态文本，后续接入真实服务时需要重新审查合规文案。
 export const privacyPolicySections: Array<string> = [
   'AIDataInsight 是一个学习项目，当前版本仅用于演示多端架构、契约生成和本地 mock 流程。',
   '应用会在登录后保存本地会话状态，用于演示自动登录和退出登录流程。当前学习版本不连接真实生产后端。',

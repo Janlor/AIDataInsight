@@ -38,6 +38,7 @@ import { appRequester } from '../../../app/services/AppServices'
 export type AIChatStateListener = (state: AIChatUiState) => void
 
 export class AIChatRuntimeStore {
+  // RuntimeStore 持有 use case 和 UI 状态，页面通过订阅获得状态更新。
   private loadTemplateUseCase: LoadTemplateUseCase
   private loadHistoryDetailUseCase: LoadHistoryDetailUseCase
   private sendFunctionMessageUseCase: SendFunctionMessageUseCase
@@ -64,6 +65,7 @@ export class AIChatRuntimeStore {
   subscribe(listener: AIChatStateListener): () => void {
     this.listeners.push(listener)
     return (): void => {
+      // 返回取消订阅函数，页面销毁时调用避免重复通知。
       this.listeners = this.listeners.filter((item: AIChatStateListener): boolean => item !== listener)
     }
   }
@@ -84,6 +86,7 @@ export class AIChatRuntimeStore {
   }
 
   async loadTemplate(): Promise<AIChatUiState> {
+    // 新会话先加载模板问题，用于欢迎态快捷提问。
     this.state = buildAIChatUiState(null, new Array<AIChatMessageUiModel>(), new Array<string>(), '', true, false, false, null, false)
     try {
       let questions = await this.loadTemplateUseCase.execute()
@@ -100,6 +103,7 @@ export class AIChatRuntimeStore {
   }
 
   async loadHistoryDetail(historyId: number): Promise<AIChatUiState> {
+    // 切换历史会话时清空当前消息，加载完成后再展示回放内容。
     this.state = buildAIChatUiState(historyId, new Array<AIChatMessageUiModel>(), new Array<string>(), '', false, true, false, null, false)
     try {
       let messages = mapConversationMessages(await this.loadHistoryDetailUseCase.execute(historyId))
@@ -116,6 +120,7 @@ export class AIChatRuntimeStore {
       return this.state
     }
 
+    // 先插入用户消息和 loading 占位，后续结果回来后替换最后一条消息。
     let userMessage = makeUserMessage(this.nextId('local-user'), trimmed)
     let loadingMessage = makeLoadingMessage(this.nextId('local-assistant-loading'))
     let messages = this.state.messages.concat([userMessage, loadingMessage])
@@ -124,6 +129,7 @@ export class AIChatRuntimeStore {
 
     let result = await this.sendFunctionMessageUseCase.execute(trimmed, activeHistoryId)
     if (result.kind === SendFunctionResultKind.Intent) {
+      // 参数不足时展示补充意图，不继续拉取图表。
       this.setState(buildAIChatUiState(
         activeHistoryId,
         replaceLastMessage(this.state.messages, this.makeIntentMessage(result.text ?? '需要补充查询条件', result.intentType ?? AIChatIntentType.Time)),
@@ -139,6 +145,7 @@ export class AIChatRuntimeStore {
     }
 
     if (result.kind === SendFunctionResultKind.ChartRequest && result.name !== null && result.name !== undefined && result.historyId !== null && result.historyId !== undefined && result.argumentsValue !== null && result.argumentsValue !== undefined) {
+      // 函数识别成功后再请求图表详情，避免函数接口承担大数据返回。
       let chartResult = await this.loadChartDataUseCase.execute(result.name, result.historyId, result.argumentsValue)
       if (chartResult.kind === LoadChartResultKind.Chart && chartResult.payload !== null && chartResult.payload !== undefined) {
         this.setState(buildAIChatUiState(
@@ -175,6 +182,7 @@ export class AIChatRuntimeStore {
   async sendFeedback(historyDetailId: number, like: string): Promise<AIChatUiState> {
     let target = like === '1' ? FeedbackState.Liked : FeedbackState.Disliked
     let previous = this.state.messages
+    // 点赞/点踩先乐观更新，接口失败则恢复之前的消息列表。
     this.state = buildAIChatUiState(
       this.state.historyId ?? null,
       updateMessageFeedback(this.state.messages, historyDetailId, target),
@@ -208,6 +216,7 @@ export class AIChatRuntimeStore {
     try {
       let responseText = ''
       await this.streamAIResponseUseCase.execute(text, (chunk: string) => {
+        // 当前实现先累积完整文本，后续可改为每个 chunk 都 setState 实时刷新。
         responseText += chunk
       })
       if (responseText.length === 0) {
@@ -245,6 +254,7 @@ export class AIChatRuntimeStore {
   }
 
   private notify(): void {
+    // 逐个通知订阅者，保持页面状态和 runtime 内部状态同步。
     for (let index = 0; index < this.listeners.length; index++) {
       this.listeners[index](this.state)
     }
@@ -316,6 +326,7 @@ export class AIChatRuntimeStore {
   }
 
   private nextId(prefix: string): string {
+    // 本地消息 id 单调递增，避免同一轮会话中重复 key。
     this.messageCounter += 1
     return `${prefix}-${this.messageCounter}`
   }

@@ -2,12 +2,14 @@ import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { AccountUser } from '../model/ContractModelExports'
 
+// 当前用户资料缓存抽象，设置页会先读取本地数据再刷新远端资料。
 export interface AccountUserStore {
   load(): Promise<AccountUser | null>
   save(user: AccountUser): Promise<void>
   clear(): Promise<void>
 }
 
+// 单元测试和预览使用的内存用户资料缓存。
 export class MemoryAccountUserStore implements AccountUserStore {
   private user: AccountUser | null
 
@@ -33,6 +35,7 @@ export class PreferencesAccountUserStore implements AccountUserStore {
   private cachedPreferences: preferences.Preferences | null = null
 
   configure(context: common.UIAbilityContext): void {
+    // context 变化时重新获取 Preferences，避免跨 Ability 复用旧句柄。
     this.context = context
     this.cachedPreferences = null
   }
@@ -44,6 +47,7 @@ export class PreferencesAccountUserStore implements AccountUserStore {
       if (!hasUser) {
         return null
       }
+      // Preferences 只保存基础字段，读取后恢复为 AccountUser。
       return {
         id: this.optionalNumber(storage.getSync('id', -1)),
         username: this.optionalString(storage.getSync('username', '')),
@@ -84,6 +88,7 @@ export class PreferencesAccountUserStore implements AccountUserStore {
       return this.cachedPreferences
     }
     if (this.context === null) {
+      // 调用方必须先通过 configureAppServices 注入 Ability context。
       throw new Error('PreferencesAccountUserStore must be configured before use.')
     }
     try {

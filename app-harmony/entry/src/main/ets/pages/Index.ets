@@ -16,6 +16,7 @@ struct Index {
   @State historyOpenRequestVersion: number = 0
 
   aboutToAppear() {
+    // 页面出现时先解析本地登录态，再决定初始页面。
     this.resolveInitialDestination()
   }
 
@@ -24,6 +25,7 @@ struct Index {
       AIDataInsightGradientBackground()
 
       if (this.isResolvingSession) {
+        // 会话恢复期间展示轻量启动态，避免登录页和首页闪烁。
         Column() {
           Text('AIDataInsight')
             .fontSize(AppTypography.title)
@@ -53,6 +55,7 @@ struct Index {
       } else if (this.current === AppDestination.Setting) {
         SettingPage({
           onBack: () => {
+            // 从设置页返回首页时触发一次历史面板刷新请求。
             this.historyOpenRequestVersion += 1
             this.current = AppDestination.AIHome
           },
@@ -83,6 +86,7 @@ struct Index {
   }
 
   private async resolveInitialDestination(): Promise<void> {
+    // 当前仅依赖本地 accessToken 判断是否可自动进入主界面。
     let canAutoLogin = await accountAuthService.canAutoLogin()
     this.current = canAutoLogin ? AppDestination.AIHome : AppDestination.Login
     this.isResolvingSession = false

@@ -19,6 +19,7 @@ export function buildLoginUiState(
   isLoading: boolean,
   errorMessage?: string | null
 ): LoginUiState {
+  // 输入长度限制和 canLogin 派生状态集中在应用状态层计算。
   return {
     username: limitText(username, maxLoginUsernameLength),
     password: limitText(password, maxLoginPasswordLength),
@@ -34,6 +35,7 @@ export function canLogin(username: string, password: string, isLoading: boolean)
 }
 
 export function validateLoginInput(state: LoginUiState): string | null {
+  // 登录前做本地校验，未同意隐私政策时不请求后端。
   if (!hasText(state.username)) {
     return '请输入账号'
   }
@@ -47,6 +49,7 @@ export function validateLoginInput(state: LoginUiState): string | null {
 }
 
 export function limitText(value: string, maxLength: number): string {
+  // 避免输入超出后端和跨端契约允许的最大长度。
   if (value.length <= maxLength) {
     return value
   }

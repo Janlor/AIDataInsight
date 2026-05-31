@@ -34,6 +34,7 @@ export function initialHistoryUiState(): HistoryUiState {
 }
 
 export function buildHistorySections(records: Array<HistoryRecord>): Array<HistorySectionUiModel> {
+  // 历史列表按更新时间归入“今天 / 本月 / 其它”，并保持固定展示顺序。
   let groups = new Map<string, Array<HistoryRecord>>()
   for (let index = 0; index < records.length; index++) {
     let record = records[index]
@@ -73,6 +74,7 @@ function appendSection(
     return
   }
 
+  // 空分区不展示，避免侧边栏出现无内容标题。
   let items = new Array<HistoryItemUiModel>()
   for (let index = 0; index < records.length; index++) {
     let record = records[index]
@@ -86,6 +88,7 @@ function appendSection(
 }
 
 function sectionTitleFor(value?: string | null): string {
+  // 后端时间格式为 yyyy-MM-dd HH:mm:ss，取前 10 位即可判断日期归属。
   if (value === null || value === undefined || value.length < 10) {
     return '其它'
   }
@@ -102,6 +105,7 @@ function sectionTitleFor(value?: string | null): string {
 }
 
 function displayTime(record: HistoryRecord, sectionTitle: string): string {
+  // 不同分区展示不同粒度时间，减少列表信息噪音。
   let source = record.updateTime ?? record.createTime ?? ''
   if (sectionTitle === '今天' && source.length >= 16) {
     return source.substring(11, 16)

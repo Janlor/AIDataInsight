@@ -16,6 +16,7 @@ export function normalizeTemplateQuestions(payload: TemplateQuestionSet | string
   }
 
   if (typeof payload === 'string') {
+    // Apifox mock 可能把问题集合包成 JSON 字符串，递归解一次。
     return normalizeTemplateQuestions(parseJson<TemplateQuestionSet>(payload));
   }
 
@@ -23,6 +24,7 @@ export function normalizeTemplateQuestions(payload: TemplateQuestionSet | string
 }
 
 export function mapHistoryRecordToMessages(record: HistoryRecord | null | undefined): ConversationMessage[] {
+  // 历史详情中可能混有无法识别的明细，flatMap 会过滤掉 null。
   return (record?.detailList ?? []).flatMap((detail, index) => {
     const message = mapHistoryDetailToMessage(detail, index);
     return message ? [message] : [];
@@ -30,6 +32,7 @@ export function mapHistoryRecordToMessages(record: HistoryRecord | null | undefi
 }
 
 export function mapFunctionModelToMessage(model: FunctionModel, fallbackId = 'assistant-current'): ConversationMessage {
+  // hasTool=true 但还不能画图时，前端按 intent 消息展示补充参数提示。
   return {
     id: buildMessageId(fallbackId, model.historyId),
     role: 'assistant',
@@ -94,6 +97,7 @@ export function mapChartDetailToPayload(detail: HistoryChartDetail): ChartPayloa
   const series: ChartSeries[] = [];
 
   if (commonItems.length > 0) {
+    // 普通图表接口返回单值列表，Web 端归并为一个 series 渲染。
     series.push({
       xAxis: commonItems[0]?.name ?? commonItems[0]?.bizId ?? functionName ?? 'chart',
       labels: commonItems.map((item) => item.name ?? item.bizId ?? ''),
@@ -102,6 +106,7 @@ export function mapChartDetailToPayload(detail: HistoryChartDetail): ChartPayloa
   }
 
   accountAgeItems.forEach((item) => {
+    // 账龄图表每个分组自带 label/value 数组，保留为独立 series。
     series.push({
       xAxis: item.name ?? 'accountAge',
       labels: item.labelList ?? [],
@@ -141,6 +146,7 @@ function mapHistoryDetailToMessage(
   }
 
   if (detail.contentType === '2') {
+    // 图表历史内容以 JSON 字符串存储，需要恢复成 HistoryChartDetail。
     const chartDetail = parseJson<HistoryChartDetail>(detail.content);
     if (!chartDetail) {
       return assistantTextMessage(id, detail, '图表数据解析失败');
@@ -163,6 +169,7 @@ function mapHistoryDetailToMessage(
 
   const model = parseJson<FunctionModel>(detail.content);
   if (model) {
+    // 普通 AI 历史内容可能是函数识别 JSON，优先提取 msg 和函数信息。
     return {
       ...mapFunctionModelToMessage(model, id),
       id,
@@ -201,6 +208,7 @@ function mapFeedback(value: HistoryDetail['isLike']): ConversationMessage['feedb
 }
 
 function inferChartUnit(functionName: FunctionName | null): ChartPayload['unit'] {
+  // 库存类图表按吨展示，其余经营数据默认按金额展示。
   if (functionName?.toLowerCase().includes('stock') || functionName?.toLowerCase().includes('inventory')) {
     return 'ton';
   }

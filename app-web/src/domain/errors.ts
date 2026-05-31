@@ -16,6 +16,7 @@ export class AppError extends Error {
     },
   ) {
     super(message);
+    // 保留后端业务码和链路 id，UI 展示消息的同时也方便排查接口问题。
     this.name = 'AppError';
     this.kind = kind;
     this.code = detail?.code;
@@ -25,6 +26,7 @@ export class AppError extends Error {
 }
 
 export function toAppError(error: unknown): AppError {
+  // 把未知异常统一转换成 AppError，调用方只需要处理一种错误形态。
   if (error instanceof AppError) {
     return error;
   }

@@ -22,11 +22,13 @@ export function AppShell({ children }: { children: ReactNode }) {
   const hydrate = useAccountStore((state) => state.hydrate);
 
   useEffect(() => {
+    // AppShell 是受保护布局，进入后先恢复本地账号状态。
     hydrate();
   }, [hydrate]);
 
   useEffect(() => {
     if (isHydrated && !session.isLogin) {
+      // hydrate 完成后仍未登录，替换到登录页，避免返回键回到受保护页面。
       router.replace('/login');
     }
   }, [isHydrated, router, session.isLogin]);
@@ -70,6 +72,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                     item.href === '/ai'
                       ? (event) => {
                           event.preventDefault();
+                          // newChat 时间戳用于强制 AI 页面重建，清空当前会话状态。
                           router.push(`/ai?newChat=${Date.now()}`);
                         }
                       : undefined

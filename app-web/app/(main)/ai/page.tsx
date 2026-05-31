@@ -23,6 +23,7 @@ function AIPageContent() {
   const historyId = parseHistoryId(searchParams.get('historyId'));
   const newChatId = searchParams.get('newChat') ?? 'initial';
 
+  // key 根据 historyId/newChat 变化，确保切换历史或新会话时重建聊天控制器。
   return <AIWorkspace key={historyId ? `history-${historyId}` : `new-${newChatId}`} historyId={historyId} />;
 }
 
@@ -31,6 +32,7 @@ function AIWorkspace({ historyId }: { historyId: number | null }) {
   const templateQuery = useTemplateQuestions();
   const chat = useAIChatController(historyId);
   const templateQuestions = templateQuery.data ?? t.ai.defaultQuestions;
+  // 只有新会话欢迎态展示推荐问题，历史回放或发送中都隐藏。
   const showSuggestions = !historyId && chat.messages.length <= 1 && !chat.isSending;
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -154,6 +156,7 @@ function MessageContent({
 }) {
   const { t } = useI18n();
   if (message.contentKind === 'chart') {
+    // 图表消息附带点赞/点踩，反馈绑定后端 historyDetailId。
     return (
       <div>
         <p className="font-medium">{t.ai.chartResult}</p>
@@ -164,6 +167,7 @@ function MessageContent({
   }
 
   if (message.contentKind === 'intent') {
+    // 意图消息表示后端需要更多参数，当前先用文案提示用户补充。
     return (
       <div>
         <p>{message.text ?? t.ai.intentFallback}</p>
@@ -192,6 +196,7 @@ function FeedbackActions({
 }) {
   const { t } = useI18n();
   if (message.role !== 'assistant' || !message.historyDetailId) {
+    // 只有落库的助手回答才允许反馈，欢迎语和本地临时消息不展示操作。
     return null;
   }
 
@@ -228,6 +233,7 @@ function FeedbackActions({
 }
 
 function parseHistoryId(value: string | null): number | null {
+  // URL 中非法 historyId 直接视为新会话。
   if (!value) {
     return null;
   }

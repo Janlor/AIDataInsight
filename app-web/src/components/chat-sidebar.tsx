@@ -24,6 +24,7 @@ export function ChatSidebar() {
   const [isSettingOpen, setSettingOpen] = useState(false);
   const [deletedIds, setDeletedIds] = useState<Set<string>>(() => new Set());
   const activeHistoryId = searchParams.get('historyId');
+  // 删除后先在本地过滤，等待 React Query 重新拉取历史列表。
   const sections = (historyQuery.data ?? [])
     .map((section) => ({
       ...section,
@@ -39,6 +40,7 @@ export function ChatSidebar() {
       setDeletedIds((current) => new Set(current).add(deletedId));
       void queryClient.invalidateQueries({ queryKey: ['history'] });
       if (pathname === '/ai' && activeHistoryId === deletedId) {
+        // 当前正在查看的会话被删除时，回到空白新会话。
         router.replace('/ai');
       }
     },
@@ -53,6 +55,7 @@ export function ChatSidebar() {
           href="/ai"
           onClick={(event) => {
             event.preventDefault();
+            // 使用查询参数触发聊天页 key 变化，实现真正的新会话。
             router.push(`/ai?newChat=${Date.now()}`);
           }}
         >

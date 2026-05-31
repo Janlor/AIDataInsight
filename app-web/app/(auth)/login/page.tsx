@@ -23,11 +23,13 @@ export default function LoginPage() {
     setError(null);
 
     if (!name.trim() || !pwd.trim()) {
+      // 表单基础校验在前端完成，避免空请求进入登录接口。
       setError(t.login.missingCredentials);
       return;
     }
 
     if (!accepted) {
+      // Web 端和移动端保持一致：未同意隐私政策时不允许登录。
       setError(t.login.missingPrivacy);
       return;
     }
@@ -35,6 +37,7 @@ export default function LoginPage() {
     setSubmitting(true);
     try {
       await login({ name: name.trim(), pwd });
+      // 登录成功后替换路由，避免浏览器返回回到登录页。
       router.replace('/ai');
     } catch (loginError) {
       setError(loginError instanceof Error ? loginError.message : t.login.failed);

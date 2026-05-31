@@ -16,6 +16,7 @@ export function buildSettingStateFromContract({
   session: AccountSession;
   user: AccountUser | null;
 }): SettingUiState {
+  // generated contract 提供静态结构；账号相关行在运行时用当前会话和用户资料填充。
   return {
     ...contractState,
     sections: contractState.sections.map((section) => ({
@@ -30,10 +31,12 @@ export function buildSettingStateFromContract({
 }
 
 export function getDisplayName(session: AccountSession, user: AccountUser | null, fallback = '已登录用户') {
+  // 展示名优先级和移动端保持一致：昵称 > 用户名 > 会话用户名 > 兜底文案。
   return user?.nickname ?? user?.username ?? session.username ?? fallback;
 }
 
 export function getInitials(name: string) {
+  // 英文多词取前两个词首字母，中文或紧凑名称取前两个字符。
   const parts = name
     .trim()
     .split(/\s+/)

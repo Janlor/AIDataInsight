@@ -8,6 +8,7 @@ export function ChartMessage({ payload }: { payload: ChartPayload | null | undef
   const series = payload?.series ?? [];
 
   if (series.length === 0) {
+    // 后端可能返回无图表但有说明文案的结果，按空态文本展示。
     return (
       <p className="mt-2 text-label-secondary">{payload?.emptyMessage ?? t.chart.empty}</p>
     );
@@ -16,6 +17,7 @@ export function ChartMessage({ payload }: { payload: ChartPayload | null | undef
   return (
     <div className="mt-3 space-y-3">
       {series.map((item) => {
+        // 用当前 series 的最大绝对值归一化条形宽度，避免负值影响比例。
         const maxValue = Math.max(...item.values.map((value) => Math.abs(value)), 1);
         return (
           <div key={item.xAxis} className="rounded-control bg-surface-primary p-3">

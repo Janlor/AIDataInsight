@@ -9,6 +9,7 @@ export interface ResponseEnvelope<T> {
   tid?: string | null;
 }
 
+// 统一 HTTP 层只支持业务接口当前需要的方法集合。
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 export interface RequestOptions {
@@ -27,9 +28,11 @@ export interface HttpAuthBridge {
 }
 
 let authBridge: HttpAuthBridge | null = null;
+// 多个请求同时收到 402 时共享同一个刷新任务，避免重复刷新 token。
 let refreshTask: Promise<boolean> | null = null;
 
 export function configureHttpAuthBridge(bridge: HttpAuthBridge) {
+  // 由账号 store 注入 token 读取、刷新和清理能力，HTTP 层不直接依赖 Zustand。
   authBridge = bridge;
 }
 
@@ -38,6 +41,7 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
 }
 
 export async function* streamText(path: string, options: RequestOptions = {}): AsyncGenerator<string> {
+  // SSE 兜底接口返回的是文本流，不走统一 JSON 响应信封解析。
   const response = await fetch(buildRequestUrl(path, options.query), {
     method: options.method ?? 'GET',
     headers: buildHeaders(options),
@@ -60,6 +64,7 @@ export async function* streamText(path: string, options: RequestOptions = {}): A
     const { value, done } = await reader.read();
     buffer += decoder.decode(value, { stream: !done });
 
+    // buffer 可能只包含半个事件，解析函数会把未完成内容留到下一轮。
     const parsed = parseServerSentEventBuffer(buffer);
     buffer = parsed.remaining;
     for (const chunk of parsed.chunks) {
@@ -100,6 +105,7 @@ async function requestInternal<T>(
   }
 
   if (envelope.code === 402 && !options.skipRefresh && !hasRetriedAfterRefresh) {
+    // 402 是后端约定的 access token 过期码；刷新成功后仅重试一次原请求。
     const refreshed = await refreshAccessToken();
     if (refreshed) {
       return requestInternal<T>(path, options, true);
@@ -107,6 +113,7 @@ async function requestInternal<T>(
   }
 
   if (envelope.code === 401 || envelope.code === 402) {
+    // 认证不可恢复或刷新失败时，清空本地会话，让页面回到登录流程。
     authBridge?.clearSession();
   }
 
@@ -122,6 +129,7 @@ async function refreshAccessToken(): Promise<boolean> {
     return false;
   }
 
+  // refreshTask 使用空值合并，保证并发请求只触发一次 refreshToken。
   refreshTask ??= authBridge
     .refreshToken()
     .catch(() => false)
@@ -133,6 +141,7 @@ async function refreshAccessToken(): Promise<boolean> {
 }
 
 export function buildRequestUrl(path: string, query?: RequestOptions['query']) {
+  // 使用 URL 构造器拼接路径和查询参数，避免手写字符串遗漏编码。
   const baseUrl = runtimeConfig.apiBaseUrl.endsWith('/')
     ? runtimeConfig.apiBaseUrl
     : `${runtimeConfig.apiBaseUrl}/`;
@@ -150,6 +159,7 @@ export function parseServerSentEventBuffer(buffer: string): {
   chunks: string[];
   remaining: string;
 } {
+  // 一个 SSE 事件以空行结束，data 可跨多行，需要合并后作为单个 chunk。
   const normalized = buffer.replace(/\r\n/g, '\n');
   const events = normalized.split('\n\n');
   const remaining = events.pop() ?? '';
@@ -180,6 +190,7 @@ function buildHeaders(options: RequestOptions): HeadersInit {
 
   const token = options.skipAuth ? null : authBridge?.getAccessToken();
   if (token) {
+    // 后端和移动端统一使用 Bearer token 认证。
     headers.Authorization = `Bearer ${token}`;
   }
 
@@ -188,6 +199,7 @@ function buildHeaders(options: RequestOptions): HeadersInit {
 
 async function parseEnvelope<T>(response: Response): Promise<ResponseEnvelope<T>> {
   try {
+    // 所有普通接口必须返回 { code, msg, data, trace, tid } 信封。
     const json = (await response.json()) as Partial<ResponseEnvelope<T>>;
     if (typeof json.code !== 'number') {
       throw new AppError('dataFormat', '响应缺少业务 code');

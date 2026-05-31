@@ -2,6 +2,7 @@ import type { HistoryRecord, RecordPage } from '@/contracts/generated/models';
 import type { HistorySection } from './history-types';
 
 export function mapRecordPageToSections(page: RecordPage | null | undefined, now = new Date()): HistorySection[] {
+  // 固定分桶顺序，保证侧边栏分区展示稳定。
   const buckets: Record<HistorySection['kind'], HistorySection> = {
     today: { kind: 'today', title: '今天', items: [] },
     thisMonth: { kind: 'thisMonth', title: '本月', items: [] },
@@ -21,6 +22,7 @@ export function mapRecordPageToSections(page: RecordPage | null | undefined, now
 }
 
 function inferSectionKind(record: HistoryRecord, now: Date): HistorySection['kind'] {
+  // 优先按更新时间分组，缺失时退回创建时间。
   const date = parseContractDate(record.updateTime ?? record.createTime);
   if (!date) {
     return 'other';
@@ -42,6 +44,7 @@ function inferSectionKind(record: HistoryRecord, now: Date): HistorySection['kin
 }
 
 function formatDisplayTime(value: string | null | undefined, sectionKind: HistorySection['kind']): string {
+  // 不同分区使用不同粒度的时间展示，减少侧边栏视觉噪音。
   const date = parseContractDate(value);
   if (!date) {
     return '';
@@ -65,6 +68,7 @@ function parseContractDate(value: string | null | undefined): Date | null {
   if (!value) {
     return null;
   }
+  // 后端返回 "yyyy-MM-dd HH:mm:ss"，浏览器更稳定解析 T 分隔格式。
   const date = new Date(value.replace(' ', 'T'));
   return Number.isNaN(date.getTime()) ? null : date;
 }

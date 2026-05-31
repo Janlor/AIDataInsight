@@ -26,6 +26,7 @@ export function SettingModal({ open, onClose }: { open: boolean; onClose: () => 
 
   useEffect(() => {
     if (open && session.isLogin) {
+      // 打开设置时刷新用户资料，先展示缓存，远端失败不阻断弹窗。
       void loadUserInfo().catch(() => undefined);
     }
   }, [loadUserInfo, open, session.isLogin]);
@@ -37,6 +38,7 @@ export function SettingModal({ open, onClose }: { open: boolean; onClose: () => 
   async function confirmLogout() {
     setLoggingOut(true);
     await logout().finally(() => {
+      // 无论后端 logout 是否成功，本地都清理会话并回到登录页。
       setLoggingOut(false);
       setConfirmingLogout(false);
       onClose();
@@ -86,7 +88,10 @@ export function SettingModal({ open, onClose }: { open: boolean; onClose: () => 
                     />
                   ))}
                   {section.kind === 'about' ? (
-                    <LanguageRow onClick={() => setChoosingLanguage(true)} />
+                    <>
+                      {/* 语言切换是 Web 端增强能力，不属于后端设置契约行。 */}
+                      <LanguageRow onClick={() => setChoosingLanguage(true)} />
+                    </>
                   ) : null}
                 </div>
               </section>
@@ -200,6 +205,7 @@ function SettingRowItem({
 }) {
   const { t } = useI18n();
   const title = t.setting.rows[row.kind];
+  // 后端契约中的“未设置”交给 i18n 替换，版本号保持原样展示。
   const detail =
     row.detail === '未设置'
       ? t.setting.unset

@@ -155,12 +155,14 @@ public struct URLSessionHTTPClient: HTTPClient {
             return envelope
         case 401:
             try await sessionManager?.clear(reason: .unauthorized)
+            postSessionInvalidation(reason: .unauthorized)
             throw AppError(kind: .sessionInvalid(.unauthorized), traceID: envelope.trace, transactionID: envelope.tid)
         case 402 where allowsRefresh:
             _ = try await refreshAccessToken()
             return try await send(request, as: payloadType, allowsRefresh: false)
         case 402:
             try await sessionManager?.clear(reason: .refreshFailed)
+            postSessionInvalidation(reason: .refreshFailed)
             throw AppError(kind: .sessionInvalid(.refreshFailed), traceID: envelope.trace, transactionID: envelope.tid)
         default:
             throw AppError(
@@ -174,6 +176,7 @@ public struct URLSessionHTTPClient: HTTPClient {
     private func refreshAccessToken() async throws -> AccountSessionContract {
         guard let refreshToken = await sessionManager?.refreshToken, refreshToken.isEmpty == false else {
             try await sessionManager?.clear(reason: .refreshFailed)
+            postSessionInvalidation(reason: .refreshFailed)
             throw AppError(kind: .sessionInvalid(.refreshFailed))
         }
 
@@ -188,12 +191,21 @@ public struct URLSessionHTTPClient: HTTPClient {
 
             guard envelope.code == 200, let session = envelope.data else {
                 try await sessionManager?.clear(reason: .refreshFailed)
+                postSessionInvalidation(reason: .refreshFailed)
                 throw AppError(kind: .sessionInvalid(.refreshFailed), traceID: envelope.trace, transactionID: envelope.tid)
             }
 
             try await sessionManager?.persist(session)
             return session
         }
+    }
+
+    private func postSessionInvalidation(reason: SessionInvalidationReason) {
+        NotificationCenter.default.post(
+            name: .appSessionInvalidated,
+            object: nil,
+            userInfo: [SessionInvalidationNotification.reasonKey: reason]
+        )
     }
 
     private func makeURLRequest(from request: HTTPRequest, includesAccessToken: Bool = true) async throws -> URLRequest {

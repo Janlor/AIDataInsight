@@ -6,6 +6,7 @@
 //
 
 import AppDesignSystem
+import AppCore
 import Foundation
 import FeatureAIChat
 import FeatureHistory
@@ -77,19 +78,16 @@ struct RootView: View {
         .onReceive(NotificationCenter.default.publisher(for: .requestLogout)) { _ in
             showsLogoutConfirmation = true
         }
+        .onReceive(NotificationCenter.default.publisher(for: .appSessionInvalidated)) { notification in
+            handleSessionInvalidation(SessionInvalidationNotification.reason(from: notification) ?? .unauthorized)
+        }
         .onChange(of: environment.settingStore.state.didLogout) { _, didLogout in
             guard didLogout else {
                 return
             }
             environment.loginStore.markLoggedOut()
             environment.settingStore.consumeLogoutSignal()
-            environment.historyStore.clearCachedData()
-            environment.chatStore.startNewChat()
-            settingPath.removeAll()
-            showsSetting = false
-            closeCompactHistory()
-            showsPrivacy = false
-            showsLogoutConfirmation = false
+            clearProtectedStateForLogin()
         }
         .sheet(isPresented: $showsPrivacy) {
             NavigationStack {
@@ -346,6 +344,24 @@ struct RootView: View {
     private func startNewChat() {
         environment.historyStore.clearSelection()
         environment.chatStore.startNewChat()
+    }
+
+    private func handleSessionInvalidation(_ reason: SessionInvalidationReason) {
+        guard reason != .logout, environment.loginStore.state.isAuthenticated else {
+            return
+        }
+        environment.loginStore.markLoggedOut()
+        clearProtectedStateForLogin()
+    }
+
+    private func clearProtectedStateForLogin() {
+        environment.historyStore.clearCachedData()
+        environment.chatStore.startNewChat()
+        settingPath.removeAll()
+        showsSetting = false
+        closeCompactHistory()
+        showsPrivacy = false
+        showsLogoutConfirmation = false
     }
 
     private var settingView: some View {

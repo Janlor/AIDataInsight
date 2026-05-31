@@ -44,11 +44,19 @@ import Foundation
         transport: transport,
         sessionManager: session
     )
+    let notifications = NotificationCenter.default.notifications(named: .appSessionInvalidated)
+    let notificationTask = Task {
+        for await notification in notifications {
+            return SessionInvalidationNotification.reason(from: notification)
+        }
+        return nil
+    }
 
     await #expect(throws: AppError.self) {
         _ = try await client.send(HTTPRequest(path: "/protected"), as: TestPayload.self)
     }
     #expect(await session.didClear)
+    #expect(await notificationTask.value == .unauthorized)
 }
 
 private struct TestPayload: Decodable, Equatable, Sendable {

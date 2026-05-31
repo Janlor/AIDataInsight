@@ -1,7 +1,21 @@
+import Foundation
+
 public enum SessionInvalidationReason: Equatable, Sendable {
     case unauthorized
     case refreshFailed
     case logout
+}
+
+public enum SessionInvalidationNotification {
+    public static let reasonKey = "reason"
+
+    public static func reason(from notification: Notification) -> SessionInvalidationReason? {
+        notification.userInfo?[reasonKey] as? SessionInvalidationReason
+    }
+}
+
+public extension Notification.Name {
+    static let appSessionInvalidated = Notification.Name("AIDataInsightApple.sessionInvalidated")
 }
 
 public struct AppError: Error, Equatable, Sendable {

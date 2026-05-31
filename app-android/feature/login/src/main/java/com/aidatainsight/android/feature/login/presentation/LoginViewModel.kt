@@ -34,11 +34,13 @@ class LoginViewModel(
         if (_uiState.value.isLoading) return
         if (_uiState.value.username.isBlank() || _uiState.value.password.isBlank()) return
         if (!_uiState.value.isPrivacyAccepted) {
+            // 隐私协议未确认时不发起登录请求，和 iOS/Web 的入口约束保持一致。
             _uiState.value = _uiState.value.copy(errorMessage = "请先阅读并同意《隐私政策》")
             return
         }
 
         viewModelScope.launch {
+            // 登录成功后由仓库保存会话，导航回调只负责切换页面。
             _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
             repository.login(_uiState.value.username, _uiState.value.password)
                 .onSuccess {

@@ -23,6 +23,7 @@ fun AppNavHost() {
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val startDestination = remember {
+        // 启动页根据本地会话判断，避免已登录用户先看到登录页再跳转。
         if (AccountRuntime.graph.sessionStore.isLogin) {
             AppDestination.AIHome.route
         } else {
@@ -31,6 +32,7 @@ fun AppNavHost() {
     }
 
     BackHandler(
+        // 隐私页可能从登录页或设置页进入，统一先回到上一层。
         enabled = currentBackStackEntry?.destination?.route == AppDestination.Privacy.route,
         onBack = { navController.popBackStack() },
     )
@@ -78,6 +80,7 @@ fun AppNavHost() {
 }
 
 private fun NavHostController.navigateToAIHomeAndClearBackStack() {
+    // 登录成功后清空登录页返回栈，系统返回键不会回到登录表单。
     navigate(AppDestination.AIHome.route) {
         popUpTo(graph.findStartDestination().id) { inclusive = true }
         launchSingleTop = true
@@ -85,6 +88,7 @@ private fun NavHostController.navigateToAIHomeAndClearBackStack() {
 }
 
 private fun NavHostController.navigateToLoginAndClearBackStack() {
+    // 退出登录后清空受保护页面返回栈。
     navigate(AppDestination.Login.route) {
         popUpTo(graph.findStartDestination().id) { inclusive = true }
         launchSingleTop = true

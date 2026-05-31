@@ -55,6 +55,7 @@ fun AIHomeScreen(
         BoxWithConstraints(
             modifier = Modifier.fillMaxSize(),
         ) {
+            // 600dp 以上使用左右分栏，紧凑设备使用抽屉承载历史列表。
             val isRegular = maxWidth >= 600.dp
             if (isRegular) {
                 RegularAIHome(
@@ -84,6 +85,7 @@ private fun CompactAIHome(
 
     LaunchedEffect(drawerState.isOpen) {
         if (drawerState.isOpen) {
+            // 打开历史抽屉时静默刷新，让新会话尽快出现在列表里。
             historyViewModel.refresh(silent = true)
         }
     }
@@ -133,6 +135,7 @@ private fun RegularAIHome(
 
     LaunchedEffect(isHistoryOpen) {
         if (isHistoryOpen) {
+            // 宽屏侧栏展开时刷新历史，保持和紧凑抽屉行为一致。
             historyViewModel.refresh(silent = true)
         }
     }
@@ -155,6 +158,7 @@ private fun RegularAIHome(
                 HistoryPanel(
                     onOpenSettings = onOpenSettings,
                     onOpenHistory = { id ->
+                        // 历史列表 id 来自 UI 模型字符串，加载前先转回后端 historyId。
                         id.toIntOrNull()?.let(chatViewModel::loadConversation)
                         isHistoryOpen = false
                     },
@@ -187,6 +191,7 @@ private fun AIHomeChatSurface(
     modifier: Modifier = Modifier,
 ) {
     val colors = AIDataInsightThemeTokens.colors
+    // 首页外层负责标题和操作栏，AIChatScreen 只渲染聊天主体。
     Column(
         modifier = modifier
             .fillMaxSize()

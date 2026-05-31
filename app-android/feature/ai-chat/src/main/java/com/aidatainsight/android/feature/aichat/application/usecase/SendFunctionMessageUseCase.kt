@@ -8,6 +8,7 @@ import com.aidatainsight.android.feature.aichat.domain.AIChatRepository
 class SendFunctionMessageUseCase(
     private val repository: AIChatRepository,
 ) {
+    /** 发送用户问题，并决定下一步是补参数还是请求图表。 */
     suspend operator fun invoke(
         text: String,
         historyId: Int?,
@@ -24,6 +25,7 @@ class SendFunctionMessageUseCase(
 
         val intentType = AIChatIntentResolver.resolve(arguments)
         if (intentType != null) {
+            // 时间范围或指标类型缺失时，先让 UI 引导用户补充。
             return UseCaseResult.Success(
                 SendFunctionMessageOutput.Intent(text = text, type = intentType),
             )

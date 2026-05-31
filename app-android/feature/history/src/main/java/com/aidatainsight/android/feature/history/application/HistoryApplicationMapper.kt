@@ -11,6 +11,7 @@ import java.time.format.DateTimeParseException
 object HistoryApplicationMapper {
     private val dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 
+    /** 按更新时间把历史记录归入“今天 / 本月 / 其它”。 */
     fun groupRecords(records: List<HistoryRecord>?): List<HistoryRecordGroup> {
         if (records.isNullOrEmpty()) return emptyList()
 
@@ -44,6 +45,7 @@ object HistoryApplicationMapper {
         existing: List<HistoryRecordGroup>,
         new: List<HistoryRecordGroup>,
     ): List<HistoryRecordGroup> {
+        // 分页追加时，后一页可能仍属于上一页最后一个分区，需要合并同名分区。
         if (existing.isEmpty()) return new
         val merged = existing.toMutableList()
         new.forEach { newGroup ->
@@ -71,6 +73,7 @@ object HistoryApplicationMapper {
     }
 
     private fun parseDate(value: String?): LocalDate? {
+        // 兼容后端返回的完整日期时间和仅日期两种格式。
         if (value.isNullOrBlank()) return null
         return try {
             LocalDateTime.parse(value, dateTimeFormatter).toLocalDate()

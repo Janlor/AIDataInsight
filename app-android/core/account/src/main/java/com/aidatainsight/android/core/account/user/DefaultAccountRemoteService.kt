@@ -7,6 +7,7 @@ class DefaultAccountRemoteService(
     private val networkRemoteService: com.aidatainsight.android.core.network.service.AccountRemoteService,
     private val userStore: AccountUserStore,
 ) : AccountRemoteService {
+    /** 从远端获取用户资料，并写入本地缓存。 */
     override suspend fun getUserInfo(): Result<AccountUser> {
         return runCatching {
             val user = networkRemoteService.getUserInfo()?.toAccountUser()
@@ -16,4 +17,3 @@ class DefaultAccountRemoteService(
         }
     }
 }
-

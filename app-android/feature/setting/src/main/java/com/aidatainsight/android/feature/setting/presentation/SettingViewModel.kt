@@ -24,6 +24,7 @@ class SettingViewModel(
             _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
             runCatching { repository.loadCachedSnapshot() }
                 .onSuccess { snapshot ->
+                    // 先展示本地缓存资料，再异步刷新远端资料，减少设置页空白时间。
                     _uiState.value = _uiState.value.copy(
                         snapshot = snapshot,
                         isLoading = false,
@@ -46,6 +47,7 @@ class SettingViewModel(
         if (_uiState.value.isLoggingOut) return
 
         viewModelScope.launch {
+            // 退出成功后会清理账号模块缓存，页面导航交给调用方处理。
             _uiState.value = _uiState.value.copy(isLoggingOut = true, errorMessage = null)
             repository.logout()
                 .onSuccess {

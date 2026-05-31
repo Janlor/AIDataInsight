@@ -23,6 +23,7 @@ import kotlinx.coroutines.launch
 class AIChatViewModel(
     repository: AIChatRepository = DefaultAIChatRepository(),
 ) : ViewModel() {
+    // ViewModel 只编排 UI 状态，具体接口调用和契约转换下沉到 use case / mapper。
     private val loadTemplateUseCase = LoadTemplateUseCase(repository)
     private val loadHistoryDetailUseCase = LoadHistoryDetailUseCase(repository)
     private val sendFunctionMessageUseCase = SendFunctionMessageUseCase(repository)
@@ -38,6 +39,7 @@ class AIChatViewModel(
 
     fun refresh() {
         viewModelScope.launch {
+            // 推荐问题只影响欢迎态，不阻塞已加载的聊天内容。
             _uiState.value = _uiState.value.copy(isLoadingTemplate = true, errorMessage = null)
             runCatching { loadTemplateUseCase() }
                 .onSuccess { output ->
@@ -62,6 +64,7 @@ class AIChatViewModel(
 
     fun loadConversation(historyId: Int) {
         viewModelScope.launch {
+            // 切换历史会话时先清空当前输入和消息，避免旧会话内容短暂闪现。
             _uiState.value = _uiState.value.copy(
                 historyId = historyId,
                 messages = emptyList(),
@@ -102,6 +105,7 @@ class AIChatViewModel(
         val trimmed = text.trim()
         if (trimmed.isEmpty() || _uiState.value.isLoading) return
 
+        // 先乐观插入用户消息和“思考中”占位，接口返回后再替换占位消息。
         val userMessage = AIChatMessageUiModel(
             id = "local-user-${System.currentTimeMillis()}",
             role = AIChatMessageRoleUi.User,
@@ -145,6 +149,7 @@ class AIChatViewModel(
     private suspend fun handleFunctionOutput(output: SendFunctionMessageOutput) {
         when (output) {
             is SendFunctionMessageOutput.Intent -> {
+                // 参数不足时展示补充意图，不继续请求图表数据。
                 replaceProgressMessage(
                     text = intentText(output.type),
                     contentKind = AIChatMessageContentKindUi.Intent,
@@ -153,6 +158,7 @@ class AIChatViewModel(
             }
             is SendFunctionMessageOutput.ChartRequest -> {
                 _uiState.value = _uiState.value.copy(historyId = output.historyId)
+                // 函数识别成功后再按函数名和参数请求图表详情。
                 when (val chartResult = loadChartDataUseCase(output.name, output.historyId, output.arguments)) {
                     is UseCaseResult.Failure -> replaceProgressMessage(
                         text = chartResult.message ?: CHART_FALLBACK_TEXT,
@@ -202,6 +208,7 @@ class AIChatViewModel(
         val withoutProgress = if (messages.lastOrNull()?.role == AIChatMessageRoleUi.Assistant &&
             messages.lastOrNull()?.contentKind == AIChatMessageContentKindUi.Loading
         ) {
+            // 只替换最后一个加载占位，保留前面已经完成的问答。
             messages.dropLast(1)
         } else {
             messages
@@ -232,6 +239,7 @@ class AIChatViewModel(
             else -> return
         }
         val previousMessages = _uiState.value.messages
+        // 点赞/点踩采用乐观更新，提交失败再回滚到旧消息列表。
         _uiState.value = _uiState.value.copy(
             messages = previousMessages.map { message ->
                 if (message.id == messageId) message.copy(feedback = feedback) else message

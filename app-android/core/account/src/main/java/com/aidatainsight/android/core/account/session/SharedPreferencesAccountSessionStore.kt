@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.aidatainsight.android.core.model.account.AccountSession
 
+/** SharedPreferences 会话存储，用于保存 token、组织 id 和用户名。 */
 class SharedPreferencesAccountSessionStore(
     context: Context,
 ) : AccountSessionStore {
@@ -53,6 +54,7 @@ class SharedPreferencesAccountSessionStore(
     }
 
     fun currentSessionImmediately(): AccountSession? {
+        // access token 为空但 refresh token 还在时，仍返回会话用于尝试刷新。
         if (!isLogin && refreshToken.isNullOrBlank()) return null
         return AccountSession(
             accessToken = accessToken,
@@ -84,4 +86,3 @@ class SharedPreferencesAccountSessionStore(
         const val KEY_USERNAME = "username"
     }
 }
-

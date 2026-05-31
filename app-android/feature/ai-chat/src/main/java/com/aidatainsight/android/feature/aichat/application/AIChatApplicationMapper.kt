@@ -27,10 +27,12 @@ object AIChatApplicationMapper {
     private const val DEFAULT_ASSISTANT_MESSAGE = "新版本上线啦，升级后我会变得更聪明，快来体验吧！"
 
     fun makeMessages(detailList: List<HistoryDetail>): List<ConversationMessage> {
+        // 将后端历史明细转换为聊天页面统一消息模型。
         return detailList.map(::mapToMessage)
     }
 
     fun makeChartPayload(model: HistoryChartDetail): ChartPayload? {
+        // 普通图表是一组单值项，转换成每项一个 series 便于 UI 统一渲染。
         model.chartCommonVoList?.takeIf { it.isNotEmpty() }?.let { list ->
             return ChartPayload(
                 functionName = model.funcType,
@@ -50,6 +52,7 @@ object AIChatApplicationMapper {
         model.accountAgeGroupVoList?.takeIf { it.isNotEmpty() }?.let { list ->
             val first = list.first()
             if (first.chartType == "2" && first.msg != null) {
+                // 账龄接口用 chartType=2 表示无图表但有说明文案。
                 return ChartPayload(
                     functionName = model.funcType,
                     unit = unitFor(model.funcType),
@@ -76,6 +79,7 @@ object AIChatApplicationMapper {
     }
 
     fun makeFunctionModel(data: JsonObject): FunctionModel {
+        // /chat/function 返回的 arguments 结构依赖 name，需要按函数名手动解码。
         val name = data["name"]?.jsonPrimitive?.contentOrNull?.let(FunctionName::fromRawValue)
         return FunctionModel(
             historyId = data["historyId"]?.jsonPrimitive?.intOrNull,
@@ -124,6 +128,7 @@ object AIChatApplicationMapper {
             model.contentType == HistoryContentType.Chart &&
             content != null
         ) {
+            // 历史图表内容存储为 JSON 字符串，进入 UI 前恢复成强类型图表载荷。
             val chartDetail = decodeChartContent(content)
             if (chartDetail != null) {
                 val payload = makeChartPayload(chartDetail)
@@ -207,6 +212,7 @@ object AIChatApplicationMapper {
     }
 
     private fun unitFor(functionName: FunctionName?): ChartUnit {
+        // 库存类函数以吨为单位，其余经营分析默认按金额展示。
         return when (functionName) {
             FunctionName.QueryStockGroupByOrg,
             FunctionName.QueryStockGroupByWarehouse,
@@ -215,4 +221,3 @@ object AIChatApplicationMapper {
         }
     }
 }
-

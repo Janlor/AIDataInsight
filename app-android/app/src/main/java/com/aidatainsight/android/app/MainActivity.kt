@@ -9,6 +9,7 @@ import androidx.activity.enableEdgeToEdge
 import com.aidatainsight.android.app.navigation.AppNavHost
 import com.aidatainsight.android.core.ui.theme.AIDataInsightTheme
 
+/** 单 Activity Compose 宿主。 */
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge(
@@ -22,6 +23,7 @@ class MainActivity : ComponentActivity() {
             ),
         )
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            // 关闭系统栏强制对比色，让设计系统背景自然延伸到边缘区域。
             window.isNavigationBarContrastEnforced = false
             window.isStatusBarContrastEnforced = false
         }

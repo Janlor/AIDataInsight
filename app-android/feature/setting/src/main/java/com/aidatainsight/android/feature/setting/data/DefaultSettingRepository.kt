@@ -10,6 +10,7 @@ import com.aidatainsight.android.feature.setting.domain.SettingRepository
 class DefaultSettingRepository(
     private val accountGraph: AccountGraph = AccountRuntime.graph,
 ) : SettingRepository {
+    /** 从本地会话和用户缓存构建设置页快照。 */
     override suspend fun loadCachedSnapshot(): SettingSnapshot {
         val cachedUser = accountGraph.userStore.getUser()
         val session = accountGraph.sessionStore.currentSession()
@@ -29,6 +30,7 @@ class DefaultSettingRepository(
         )
     }
 
+    /** 刷新远端用户资料，并映射为设置页快照。 */
     override suspend fun refreshRemoteSnapshot(): Result<SettingSnapshot> {
         return accountGraph.accountRemoteService.getUserInfo()
             .map { remoteUser ->
@@ -49,6 +51,7 @@ class DefaultSettingRepository(
             }
     }
 
+    /** 退出登录并清理账号缓存。 */
     override suspend fun logout(): Result<Unit> {
         return accountGraph.authService.logout()
     }

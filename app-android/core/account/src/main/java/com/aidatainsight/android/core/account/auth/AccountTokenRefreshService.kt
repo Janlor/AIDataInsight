@@ -8,6 +8,7 @@ class AccountTokenRefreshService(
     private val sessionStore: AccountSessionStore,
     private val authRemoteServiceProvider: () -> AuthRemoteService,
 ) : TokenRefreshService {
+    /** 使用 refresh token 获取新凭证，并用旧会话补齐服务端未返回的字段。 */
     override suspend fun refreshToken(token: String): Boolean {
         val previous = sessionStore.currentSession()
         val model = authRemoteServiceProvider().refreshToken(token) ?: return false
@@ -17,4 +18,3 @@ class AccountTokenRefreshService(
         return true
     }
 }
-

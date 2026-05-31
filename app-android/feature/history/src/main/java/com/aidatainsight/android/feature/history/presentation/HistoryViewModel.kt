@@ -31,6 +31,7 @@ class HistoryViewModel(
 
     fun refresh(silent: Boolean = false) {
         viewModelScope.launch {
+            // 抽屉重复打开时使用 silent 刷新，避免已有列表频繁闪烁 loading。
             val shouldShowLoading = !silent || _uiState.value.sections.isEmpty()
             _uiState.value = _uiState.value.copy(
                 isLoading = shouldShowLoading,
@@ -65,6 +66,7 @@ class HistoryViewModel(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoadingMore = true, errorMessage = null)
             val nextPage = currentPage + 1
+            // 翻页时把现有分组传给 use case，由 mapper 合并相同时间分区。
             runCatching {
                 loadHistoryPage(
                     currentPage = nextPage,
@@ -91,6 +93,7 @@ class HistoryViewModel(
     fun delete(id: String) {
         val historyId = id.toIntOrNull() ?: return
         viewModelScope.launch {
+            // 删除成功后立即用本地结果刷新列表，不等待下一次整页刷新。
             _uiState.value = _uiState.value.copy(isDeleting = true, errorMessage = null)
             runCatching {
                 deleteHistory(historyId = historyId, existingGroups = recordGroups)
@@ -132,6 +135,7 @@ class HistoryViewModel(
     }
 
     private fun hasMore(currentPage: Int?, pages: Int?): Boolean {
+        // 后端返回总页数时，当前页小于总页数才继续触发分页。
         return currentPage != null && pages != null && currentPage < pages
     }
 

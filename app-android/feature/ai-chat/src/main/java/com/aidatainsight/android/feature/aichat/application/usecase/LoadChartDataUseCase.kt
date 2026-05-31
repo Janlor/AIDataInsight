@@ -10,12 +10,14 @@ import com.aidatainsight.android.feature.aichat.domain.AIChatRepository
 class LoadChartDataUseCase(
     private val repository: AIChatRepository,
 ) {
+    /** 校验函数参数类型并加载图表数据。 */
     suspend operator fun invoke(
         name: FunctionName,
         historyId: Int,
         arguments: FunctionArguments,
     ): UseCaseResult<LoadChartDataOutput> {
         if (name.argumentKind != arguments.kind) {
+            // 函数名和参数类型不一致时不请求图表，避免构造出错误 query。
             return UseCaseResult.Failure("函数参数类型不匹配。")
         }
 

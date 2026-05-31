@@ -5,14 +5,17 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 object MockApiEnvironment {
+    /** Apifox mock 环境默认地址，与跨端契约保持一致。 */
     const val DefaultBaseUrl: String = "https://m1.apifoxmock.com/m1/3174267-1700689-default"
 }
 
 object AIChatEndpoint {
+    /** AI 文本流式输出接口路径。 */
     const val StreamPath: String = "/stream"
 }
 
 @Serializable
+/** 一个可请求的 API 环境。 */
 data class ApiEnvironment(
     val name: String,
     val baseUrl: String,
@@ -20,6 +23,7 @@ data class ApiEnvironment(
 )
 
 @Serializable
+/** 登录会话契约，包含 access token、refresh token 和组织 id。 */
 data class AccountSession(
     val accessToken: String? = null,
     val refreshToken: String? = null,
@@ -29,6 +33,7 @@ data class AccountSession(
 )
 
 @Serializable
+/** 当前登录用户资料。 */
 data class AccountUser(
     val id: Int? = null,
     val username: String? = null,
@@ -37,6 +42,7 @@ data class AccountUser(
 )
 
 @Serializable
+/** 首页主区域目标页面。 */
 enum class AIHomeDestination {
     Chat,
     History,
@@ -44,12 +50,14 @@ enum class AIHomeDestination {
 }
 
 @Serializable
+/** 首页浮层面板类型。 */
 enum class AIHomePanel {
     None,
     History,
 }
 
 @Serializable
+/** 首页会话状态，用于表达登录态、当前入口和历史选择。 */
 data class AIHomeSession(
     val isAuthenticated: Boolean,
     val entryDestination: AIHomeDestination,
@@ -58,6 +66,7 @@ data class AIHomeSession(
 )
 
 @Serializable
+/** 首页跨模块命令集合。 */
 enum class AIHomeCommand {
     OpenAIHome,
     OpenHistoryPanel,
@@ -69,6 +78,7 @@ enum class AIHomeCommand {
 }
 
 @Serializable
+/** 设置页展示的账号资料。 */
 data class SettingAccountInfo(
     val nickname: String? = null,
     val username: String? = null,
@@ -76,6 +86,7 @@ data class SettingAccountInfo(
 )
 
 @Serializable
+/** 设置页能力开关。 */
 data class SettingCapability(
     val canUpdatePassword: Boolean,
     val canOpenPrivacy: Boolean,
@@ -83,6 +94,7 @@ data class SettingCapability(
 )
 
 @Serializable
+/** 设置页快照。 */
 data class SettingSnapshot(
     val accountInfo: SettingAccountInfo,
     val capability: SettingCapability,
@@ -90,6 +102,7 @@ data class SettingSnapshot(
 )
 
 @Serializable
+/** 历史明细角色类型：问题或回答。 */
 enum class HistoryDetailType(val rawValue: String) {
     @SerialName("1")
     Question("1"),
@@ -99,6 +112,7 @@ enum class HistoryDetailType(val rawValue: String) {
 }
 
 @Serializable
+/** 历史内容类型：普通 AI 文本或图表 JSON。 */
 enum class HistoryContentType(val rawValue: String) {
     @SerialName("1")
     Ai("1"),
@@ -108,6 +122,7 @@ enum class HistoryContentType(val rawValue: String) {
 }
 
 @Serializable
+/** 单条历史对话明细。 */
 data class HistoryDetail(
     val id: Int? = null,
     val historyId: Int? = null,
@@ -120,6 +135,7 @@ data class HistoryDetail(
 )
 
 @Serializable
+/** 一次历史会话记录，detailList 在详情接口中返回。 */
 data class HistoryRecord(
     val id: Int? = null,
     val name: String? = null,
@@ -133,6 +149,7 @@ data class HistoryRecord(
 )
 
 @Serializable
+/** 历史分页接口返回的页信息。 */
 data class RecordPage(
     val currentPage: Int? = null,
     val pageSize: Int? = null,
@@ -143,11 +160,13 @@ data class RecordPage(
 )
 
 @Serializable
+/** 推荐问题集合。 */
 data class TemplateQuestionSet(
     val questions: List<String> = emptyList(),
 )
 
 @Serializable
+/** 函数调用参数的结构类型。 */
 enum class FunctionArgumentKind {
     Basic,
     TimeRange,
@@ -157,6 +176,7 @@ enum class FunctionArgumentKind {
 }
 
 @Serializable
+/** 后端支持的分析函数名，也是图表接口路径的一部分。 */
 enum class FunctionName(val rawValue: String) {
     @SerialName("queryArGroupByOrg")
     QueryArGroupByOrg("queryArGroupByOrg"),
@@ -218,11 +238,13 @@ enum class FunctionName(val rawValue: String) {
         }
 
     companion object {
+        /** 根据后端原始函数名找到强类型枚举。 */
         fun fromRawValue(rawValue: String): FunctionName? = entries.firstOrNull { it.rawValue == rawValue }
     }
 }
 
 @Serializable
+/** 基础查询参数。 */
 data class BasicQuery(
     val orgId: Int? = null,
     val customerName: String? = null,
@@ -232,6 +254,7 @@ data class BasicQuery(
 )
 
 @Serializable
+/** 带时间范围的查询参数。 */
 data class TimeRangeQuery(
     val startDate: String? = null,
     val endDate: String? = null,
@@ -244,6 +267,7 @@ data class TimeRangeQuery(
 )
 
 @Serializable
+/** 仓库维度查询参数。 */
 data class WarehouseQuery(
     val orgId: Int? = null,
     val warehouseName: String? = null,
@@ -254,6 +278,7 @@ data class WarehouseQuery(
 )
 
 @Serializable
+/** 账龄查询参数。 */
 data class AccountAgeQuery(
     val orgId: Int? = null,
     val customerName: String? = null,
@@ -262,11 +287,13 @@ data class AccountAgeQuery(
 )
 
 @Serializable
+/** 经营指标类型查询参数。 */
 data class PerformanceTypeQuery(
     val indexType: String? = null,
 )
 
 @Serializable
+/** 函数参数联合类型，按 kind 约束具体参数结构。 */
 sealed interface FunctionArguments {
     val kind: FunctionArgumentKind
 
@@ -297,6 +324,7 @@ sealed interface FunctionArguments {
 }
 
 @Serializable
+/** 函数识别接口返回模型。 */
 data class FunctionModel(
     val historyId: Int? = null,
     val hasTool: Boolean? = null,
@@ -306,6 +334,7 @@ data class FunctionModel(
 )
 
 @Serializable
+/** 通用单值图表数据项。 */
 data class ChartCommonItem(
     val bizId: String? = null,
     val name: String? = null,
@@ -313,6 +342,7 @@ data class ChartCommonItem(
 )
 
 @Serializable
+/** 账龄分组图表数据项。 */
 data class AccountAgeGroupItem(
     val name: String? = null,
     val valueList: List<Double>? = null,
@@ -322,6 +352,7 @@ data class AccountAgeGroupItem(
 )
 
 @Serializable
+/** 历史图表详情，兼容普通图表和账龄图表两种结构。 */
 data class HistoryChartDetail(
     val historyDetailId: Int? = null,
     val funcType: FunctionName? = null,
@@ -330,12 +361,14 @@ data class HistoryChartDetail(
 )
 
 @Serializable
+/** 聊天消息角色。 */
 enum class ConversationRole {
     User,
     Assistant,
 }
 
 @Serializable
+/** 聊天消息展示类型。 */
 enum class ConversationContentKind {
     Welcome,
     Text,
@@ -344,12 +377,14 @@ enum class ConversationContentKind {
 }
 
 @Serializable
+/** 助手需要用户补充的意图类型。 */
 enum class AIChatIntentType {
     Time,
     Index,
 }
 
 @Serializable
+/** 回答反馈状态。 */
 enum class FeedbackState {
     Liked,
     Disliked,
@@ -358,12 +393,14 @@ enum class FeedbackState {
 }
 
 @Serializable
+/** 图表数值单位。 */
 enum class ChartUnit {
     Currency,
     Ton,
 }
 
 @Serializable
+/** 一组可绘制的图表序列。 */
 data class ChartSeries(
     val xAxis: String,
     val labels: List<String>,
@@ -371,6 +408,7 @@ data class ChartSeries(
 )
 
 @Serializable
+/** 图表消息的视图载荷。 */
 data class ChartPayload(
     val functionName: FunctionName? = null,
     val unit: ChartUnit,
@@ -379,6 +417,7 @@ data class ChartPayload(
 )
 
 @Serializable
+/** 聊天页单条消息契约，兼容文本、意图和图表。 */
 data class ConversationMessage(
     val id: String,
     val role: ConversationRole,

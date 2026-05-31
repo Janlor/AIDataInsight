@@ -8,6 +8,7 @@ import com.aidatainsight.android.feature.history.domain.HistoryRepository
 class LoadHistoryPageUseCase(
     private val repository: HistoryRepository,
 ) {
+    /** 加载历史分页，并与现有分组合并。 */
     suspend operator fun invoke(
         currentPage: Int,
         pageSize: Int,
@@ -16,6 +17,7 @@ class LoadHistoryPageUseCase(
         val page = repository.loadHistoryPage(currentPage = currentPage, pageSize = pageSize)
         val newGroups = HistoryApplicationMapper.groupRecords(page.records)
         val groups = if ((page.currentPage ?: currentPage) == 1 || existingGroups.isEmpty()) {
+            // 第一页代表刷新，直接替换已有列表。
             newGroups
         } else {
             HistoryApplicationMapper.mergeGroups(existingGroups, newGroups)

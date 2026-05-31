@@ -18,9 +18,11 @@ import com.aidatainsight.android.core.network.service.KtorAuthRemoteService
 object AccountRuntime {
     private var installedGraph: AccountGraph? = null
 
+    /** 已安装的账号依赖图，Application 启动时必须先调用 install。 */
     val graph: AccountGraph
         get() = checkNotNull(installedGraph) { "AccountRuntime has not been installed." }
 
+    /** 组装账号、网络和 token 刷新依赖，并注册到 NetworkDependencies。 */
     fun install(
         context: Context,
         baseUrl: String = DEFAULT_BASE_URL,
@@ -33,6 +35,7 @@ object AccountRuntime {
         val invalidationHandler = AccountSessionInvalidationHandler(sessionStore, userStore)
 
         lateinit var authRemoteService: KtorAuthRemoteService
+        // tokenRefreshService 需要 authRemoteService，但 apiClient 又要先拿到刷新协调器，因此这里延迟赋值。
         val tokenRefreshService = AccountTokenRefreshService(sessionStore) { authRemoteService }
         val tokenRefreshCoordinator = TokenRefreshCoordinator(tokenRefreshService)
 
@@ -61,5 +64,6 @@ object AccountRuntime {
         return graph
     }
 
+    // Android 模拟器访问宿主机 localhost 需要使用 10.0.2.2。
     private const val DEFAULT_BASE_URL = "http://10.0.2.2:3000"
 }

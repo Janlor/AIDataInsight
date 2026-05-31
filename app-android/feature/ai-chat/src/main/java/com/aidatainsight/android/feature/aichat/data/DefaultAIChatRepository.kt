@@ -25,14 +25,17 @@ class DefaultAIChatRepository(
     private val historyRemoteService: HistoryRemoteService = KtorHistoryRemoteService(apiClient),
     private val chartRemoteService: ChartRemoteService = KtorChartRemoteService(apiClient),
 ) : AIChatRepository {
+    /** 加载欢迎态推荐问题，接口为空时返回空集合。 */
     override suspend fun loadTemplate(): TemplateQuestionSet {
         return aiChatRemoteService.loadChatTemplate() ?: TemplateQuestionSet()
     }
 
+    /** 加载历史详情，供聊天页回放历史会话。 */
     override suspend fun loadHistoryDetail(historyId: Int): HistoryRecord {
         return historyRemoteService.historyDetail(historyId) ?: HistoryRecord(id = historyId)
     }
 
+    /** 调用函数识别接口，并把动态 JSON 转成强类型 FunctionModel。 */
     override suspend fun sendFunctionMessage(text: String, historyId: Int?): FunctionModel {
         val data = apiClient.get<JsonObject>(
             path = "/chat/function",
@@ -45,6 +48,7 @@ class DefaultAIChatRepository(
             ?: FunctionModel(msg = "AI 分析响应为空。")
     }
 
+    /** 根据函数识别结果加载图表详情。 */
     override suspend fun loadChartData(
         name: FunctionName,
         historyId: Int,
@@ -57,6 +61,7 @@ class DefaultAIChatRepository(
         ) ?: HistoryChartDetail(funcType = name)
     }
 
+    /** 提交点赞/点踩反馈。 */
     override suspend fun sendLikeFeedback(historyDetailId: Int, like: String) {
         historyRemoteService.likeHistoryDetail(
             historyDetailId = historyDetailId,
@@ -64,5 +69,6 @@ class DefaultAIChatRepository(
         )
     }
 
+    /** 文本流兜底接口。 */
     override fun streamMessage(text: String): Flow<String> = aiChatRemoteService.streamMessage(text)
 }

@@ -15,6 +15,7 @@ class PrivacyPolicyViewModel(
     val uiState: StateFlow<PrivacyDialogState> = _uiState.asStateFlow()
 
     fun evaluate() {
+        // 单次进程内只自动弹一次，避免用户返回登录页时被重复打断。
         if (!hasShownPolicy && !repository.isAgreedAllPolicyAgreement()) {
             hasShownPolicy = true
             _uiState.value = PrivacyDialogState(

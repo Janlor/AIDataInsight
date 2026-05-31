@@ -10,6 +10,7 @@ class AccountAuthService(
     private val sessionStore: AccountSessionStore,
     private val userStore: AccountUserStore,
 ) {
+    /** 登录成功后保存会话，供网络层后续自动添加认证头。 */
     suspend fun login(username: String, password: String): Result<AccountSession> {
         return runCatching {
             val model = authRemoteService.login(username, password)
@@ -20,6 +21,7 @@ class AccountAuthService(
         }
     }
 
+    /** 退出登录时同时清理会话和缓存用户资料。 */
     suspend fun logout(): Result<Unit> {
         return runCatching {
             authRemoteService.logout()

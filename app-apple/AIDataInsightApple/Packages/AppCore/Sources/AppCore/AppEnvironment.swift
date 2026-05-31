@@ -1,5 +1,6 @@
 import Foundation
 
+/// App 可切换的后端环境枚举，和服务端部署阶段保持一一对应。
 public enum AppEnvironment: String, CaseIterable, Identifiable, Sendable {
     case mock
     case local
@@ -11,6 +12,7 @@ public enum AppEnvironment: String, CaseIterable, Identifiable, Sendable {
     public var id: String { rawValue }
 }
 
+/// 一个可请求的 API 环境，包含环境名、基础 URL 和面向开发者的说明。
 public struct APIEnvironment: Equatable, Sendable {
     public let name: AppEnvironment
     public let baseURL: URL
@@ -76,6 +78,7 @@ public struct APIEnvironment: Equatable, Sendable {
     }
 }
 
+/// 当前客户端运行平台，用于跨端能力分支或上报。
 public enum PlatformKind: String, Sendable {
     case iPhone
     case iPad

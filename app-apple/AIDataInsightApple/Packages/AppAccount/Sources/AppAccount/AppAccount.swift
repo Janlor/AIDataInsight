@@ -4,6 +4,7 @@ import AppNetworking
 import Foundation
 import Security
 
+/// 客户端内部使用的会话模型，由登录接口契约转换而来，并补齐本地需要的判断逻辑。
 public struct AccountSession: Codable, Equatable, Sendable {
     public let accessToken: String
     public let refreshToken: String
@@ -42,18 +43,21 @@ public struct AccountSession: Codable, Equatable, Sendable {
     }
 }
 
+/// 会话持久化抽象，生产环境写入 Keychain，测试环境可使用内存实现。
 public protocol SessionStore: Sendable {
     func load() async throws -> AccountSession?
     func save(_ session: AccountSession) async throws
     func clear() async throws
 }
 
+/// 当前用户资料缓存抽象，用于设置页先展示本地数据再刷新远端数据。
 public protocol AccountUserStore: Sendable {
     func load() async throws -> AccountUserContract?
     func save(_ user: AccountUserContract) async throws
     func clear() async throws
 }
 
+/// 内存会话存储，主要用于预览、测试和不希望触碰 Keychain 的场景。
 public actor InMemorySessionStore: SessionStore {
     private var session: AccountSession?
 
@@ -74,6 +78,7 @@ public actor InMemorySessionStore: SessionStore {
     }
 }
 
+/// 内存用户资料存储，和 InMemorySessionStore 配套用于测试。
 public actor InMemoryAccountUserStore: AccountUserStore {
     private var user: AccountUserContract?
 
@@ -94,6 +99,7 @@ public actor InMemoryAccountUserStore: AccountUserStore {
     }
 }
 
+/// 使用 Keychain 保存登录会话，确保 token 不落到普通文件系统。
 public struct KeychainSessionStore: SessionStore {
     private let service: String
     private let account: String
@@ -154,6 +160,7 @@ public struct KeychainSessionStore: SessionStore {
     }
 
     private func baseQuery() -> [String: Any] {
+        // ThisDeviceOnly 避免凭证随 iCloud 或设备迁移同步到其他设备。
         [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
@@ -163,6 +170,7 @@ public struct KeychainSessionStore: SessionStore {
     }
 }
 
+/// 使用 Keychain 缓存用户资料，和会话凭证分开存储便于独立清理。
 public struct KeychainAccountUserStore: AccountUserStore {
     private let service: String
     private let account: String
@@ -223,6 +231,7 @@ public struct KeychainAccountUserStore: AccountUserStore {
     }
 
     private func baseQuery() -> [String: Any] {
+        // 用户资料不属于鉴权凭证，但仍包含手机号等敏感信息，因此同样放入 Keychain。
         [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
@@ -232,6 +241,7 @@ public struct KeychainAccountUserStore: AccountUserStore {
     }
 }
 
+/// 会话管理器，向网络层提供 token，同时负责持久化刷新后的会话和清理失效状态。
 public actor AccountSessionManager: SessionCredentialManaging {
     private let store: SessionStore
     private let userStore: AccountUserStore?
@@ -297,6 +307,7 @@ public actor AccountSessionManager: SessionCredentialManaging {
     }
 }
 
+/// 账号服务协议，封装登录、启动恢复、用户资料和退出登录流程。
 public protocol AccountServicing: Sendable {
     func resolveLaunchSession() async throws -> AccountSession?
     func login(name: String, password: String) async throws -> AccountSession
@@ -305,6 +316,7 @@ public protocol AccountServicing: Sendable {
     func logout() async throws
 }
 
+/// 真实账号服务实现，协调登录接口、会话存储和用户资料缓存。
 public struct AccountService: AccountServicing {
     private let client: HTTPClient
     private let sessionManager: AccountSessionManager

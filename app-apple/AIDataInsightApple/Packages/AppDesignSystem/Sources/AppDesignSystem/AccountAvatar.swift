@@ -1,5 +1,6 @@
 import SwiftUI
 
+/// 账号展示信息，负责清理空白值并生成头像首字母。
 public struct AccountDisplayState: Equatable, Sendable {
     public let displayName: String
     public let secondaryText: String?
@@ -14,6 +15,7 @@ public struct AccountDisplayState: Equatable, Sendable {
     public static let placeholder = AccountDisplayState(displayName: "用户")
 
     public var initials: String {
+        // 英文/拼音名称取前两个词首字母，中文或紧凑名称取前两个字符。
         let words = displayName
             .split(whereSeparator: { $0.isWhitespace || $0 == "-" || $0 == "_" || $0 == "." })
             .map(String.init)
@@ -32,6 +34,7 @@ public struct AccountDisplayState: Equatable, Sendable {
     }
 }
 
+/// 使用账号首字母绘制的轻量头像组件。
 public struct AccountInitialsAvatar: View {
     private let account: AccountDisplayState
     private let size: CGFloat

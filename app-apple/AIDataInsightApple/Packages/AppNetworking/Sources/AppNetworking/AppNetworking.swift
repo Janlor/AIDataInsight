@@ -2,11 +2,13 @@ import AppContracts
 import AppCore
 import Foundation
 
+/// 当前客户端实际用到的 HTTP 方法集合。
 public enum HTTPMethod: String, Sendable {
     case get = "GET"
     case post = "POST"
 }
 
+/// 独立于 Foundation URLQueryItem 的查询参数模型，便于在协议层保持 Sendable。
 public struct HTTPQueryItem: Equatable, Sendable {
     public let name: String
     public let value: String?
@@ -17,6 +19,7 @@ public struct HTTPQueryItem: Equatable, Sendable {
     }
 }
 
+/// 业务层发起请求时使用的轻量描述，最终由 URLSessionHTTPClient 转成 URLRequest。
 public struct HTTPRequest: Sendable {
     public let path: String
     public let method: HTTPMethod
@@ -39,10 +42,12 @@ public struct HTTPRequest: Sendable {
     }
 }
 
+/// 异步提供 access token 的最小协议，供普通请求追加 Authorization 头。
 public protocol TokenProviding: Sendable {
     var accessToken: String? { get async }
 }
 
+/// 负责持久化和清理完整会话凭证的协议，网络层通过它完成 token 刷新闭环。
 public protocol SessionCredentialManaging: TokenProviding {
     var refreshToken: String? { get async }
     var orgID: String? { get async }
@@ -50,6 +55,7 @@ public protocol SessionCredentialManaging: TokenProviding {
     func clear(reason: SessionInvalidationReason) async throws
 }
 
+/// Server-Sent Events 的单条事件载荷。
 public struct SSEEvent: Equatable, Sendable {
     public let data: String
 
@@ -58,18 +64,22 @@ public struct SSEEvent: Equatable, Sendable {
     }
 }
 
+/// JSON API 客户端抽象，返回统一响应信封，便于仓库层只处理业务 payload。
 public protocol HTTPClient: Sendable {
     func send<Payload: Decodable & Sendable>(_ request: HTTPRequest, as payloadType: Payload.Type) async throws -> APIResponseEnvelope<Payload>
 }
 
+/// SSE 流式响应抽象，用于 AI 文本回退流式输出。
 public protocol SSEStreaming: Sendable {
     func stream(_ request: HTTPRequest) -> AsyncThrowingStream<SSEEvent, Error>
 }
 
+/// URLSession 的可替换传输层，测试时可注入假实现。
 public protocol HTTPTransport: Sendable {
     func data(for request: URLRequest) async throws -> (Data, HTTPURLResponse)
 }
 
+/// 默认 URLSession 传输层，把 Foundation 响应收窄为 HTTPURLResponse。
 public struct URLSessionHTTPTransport: HTTPTransport {
     private let session: URLSession
 
@@ -86,6 +96,7 @@ public struct URLSessionHTTPTransport: HTTPTransport {
     }
 }
 
+/// 合并并发 token 刷新请求，避免多个接口同时收到 402 时重复刷新。
 public actor TokenRefreshCoordinator {
     private var task: Task<AccountSessionContract, Error>?
 
@@ -105,6 +116,7 @@ public actor TokenRefreshCoordinator {
     }
 }
 
+/// 统一的 HTTP 客户端实现，负责拼 URL、加认证头、解析响应信封和刷新 token。
 public struct URLSessionHTTPClient: HTTPClient {
     private let environment: APIEnvironment
     private let transport: HTTPTransport
@@ -154,10 +166,12 @@ public struct URLSessionHTTPClient: HTTPClient {
         case 200:
             return envelope
         case 401:
+            // 401 表示当前会话不可继续使用，立即清理本地凭证并通知 UI 回到登录态。
             try await sessionManager?.clear(reason: .unauthorized)
             postSessionInvalidation(reason: .unauthorized)
             throw AppError(kind: .sessionInvalid(.unauthorized), traceID: envelope.trace, transactionID: envelope.tid)
         case 402 where allowsRefresh:
+            // 402 约定为 access token 过期；刷新成功后仅重试一次原请求。
             _ = try await refreshAccessToken()
             return try await send(request, as: payloadType, allowsRefresh: false)
         case 402:
@@ -181,6 +195,7 @@ public struct URLSessionHTTPClient: HTTPClient {
         }
 
         return try await refreshCoordinator.refresh {
+            // refresh 接口不携带旧 access token，避免服务端把过期 token 误判为鉴权失败。
             let refreshRequest = HTTPRequest(
                 path: "/oauth2/refresh",
                 queryItems: [HTTPQueryItem(name: "refreshToken", value: refreshToken)]

@@ -25,6 +25,7 @@ struct AppScene: Scene {
             AppCommands()
         }
 #if os(macOS)
+        // macOS 使用系统 Settings 场景承载设置页；iOS/iPadOS 则由 RootView 以 sheet 展示。
         Settings {
             MacSettingsView(environment: environment)
         }
@@ -35,6 +36,7 @@ struct AppScene: Scene {
 #if os(macOS)
 private struct MacSettingsView: View {
     @Bindable var environment: AppRuntimeEnvironment
+    /// 设置页内部的导航路径，目前用于从“设置”进入“隐私政策”。
     @State private var path: [MacSettingsRoute] = []
 
     var body: some View {

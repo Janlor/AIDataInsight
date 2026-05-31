@@ -1,3 +1,4 @@
+/// 登录和刷新 token 接口返回的会话契约。
 public struct AccountSessionContract: Codable, Equatable, Sendable {
     public let accessToken: String?
     public let refreshToken: String?
@@ -47,6 +48,7 @@ public struct AccountSessionContract: Codable, Equatable, Sendable {
     }
 }
 
+/// 登录请求体。
 public struct LoginRequestContract: Codable, Equatable, Sendable {
     public let name: String
     public let pwd: String
@@ -57,10 +59,12 @@ public struct LoginRequestContract: Codable, Equatable, Sendable {
     }
 }
 
+/// 无业务数据接口使用的空 payload。
 public struct EmptyContract: Codable, Equatable, Sendable {
     public init() {}
 }
 
+/// 当前登录用户资料。
 public struct AccountUserContract: Codable, Equatable, Sendable {
     public let id: Int?
     public let username: String?

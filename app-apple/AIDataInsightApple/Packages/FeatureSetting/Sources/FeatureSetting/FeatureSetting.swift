@@ -4,12 +4,14 @@ import AppDesignSystem
 import Observation
 import SwiftUI
 
+/// 设置页分区类型。
 public enum SettingSectionKind: String, Equatable, Sendable {
     case account
     case about
     case logout
 }
 
+/// 设置页行类型，用作稳定 id 和行为判断。
 public enum SettingRowKind: String, Equatable, Sendable {
     case nickname
     case username
@@ -19,12 +21,14 @@ public enum SettingRowKind: String, Equatable, Sendable {
     case logout
 }
 
+/// 点击设置行后触发的业务动作。
 public enum SettingRowAction: Equatable, Sendable {
     case none
     case openPrivacy
     case confirmLogout
 }
 
+/// 设置页单行视图状态。
 public struct SettingRowState: Equatable, Sendable, Identifiable {
     public var id: SettingRowKind { kind }
     public let kind: SettingRowKind
@@ -37,6 +41,7 @@ public struct SettingRowState: Equatable, Sendable, Identifiable {
     public let showsDisclosure: Bool
 }
 
+/// 设置页分区视图状态。
 public struct SettingSectionState: Equatable, Sendable, Identifiable {
     public var id: SettingSectionKind { kind }
     public let kind: SettingSectionKind
@@ -44,6 +49,7 @@ public struct SettingSectionState: Equatable, Sendable, Identifiable {
     public let rows: [SettingRowState]
 }
 
+/// 退出登录确认弹窗状态。
 public struct LogoutDialogState: Equatable, Sendable {
     public var visible: Bool
     public let title: String
@@ -63,6 +69,7 @@ public struct LogoutDialogState: Equatable, Sendable {
     }
 }
 
+/// 设置页整体状态，由账号资料、功能开关、版本号和退出登录状态组成。
 public struct SettingViewState: Equatable, Sendable {
     public var title: String
     public var isLoading: Bool
@@ -98,6 +105,7 @@ public struct SettingViewState: Equatable, Sendable {
 
     public static func sections(from snapshot: SettingSnapshotContract) -> [SettingSectionState] {
         let unset = "未设置"
+        // 后端快照只描述数据和能力，这里集中把它映射成可渲染的分区/行。
         var sections: [SettingSectionState] = [
             SettingSectionState(
                 kind: .account,
@@ -131,6 +139,7 @@ public struct SettingViewState: Equatable, Sendable {
     }
 }
 
+/// 设置页状态机，负责加载账号资料、构建分区和发起退出登录。
 @MainActor
 @Observable
 public final class SettingStore {
@@ -152,6 +161,7 @@ public final class SettingStore {
             let session = try await accountService.resolveLaunchSession()
             let cachedUser = try? await accountService.cachedUserInfo()
             if let cachedUser {
+                // 先用缓存刷新界面，再等待远端资料，减少设置页打开时的空白时间。
                 state.sections = SettingViewState.sections(from: snapshot(session: session, user: cachedUser))
             }
             let user = (try? await accountService.getUserInfo()) ?? cachedUser
@@ -200,6 +210,7 @@ public final class SettingStore {
     }
 }
 
+/// 设置页面，复用同一套状态在 iOS sheet 和 macOS Settings 场景中展示。
 public struct SettingScreen: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Bindable private var store: SettingStore
@@ -446,6 +457,7 @@ private extension String {
     }
 }
 
+/// 预览和测试使用的账号服务，返回固定账号资料并模拟登录态。
 public struct PreviewAccountService: AccountServicing {
     public init() {}
 

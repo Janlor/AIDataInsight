@@ -17,6 +17,7 @@ import FeatureSetting
 import Observation
 import SwiftData
 
+/// 运行时依赖总线，负责把账号、网络、仓库、Store 和 SwiftData 容器组装到同一个生命周期里。
 @MainActor
 @Observable
 final class AppRuntimeEnvironment {
@@ -74,11 +75,13 @@ final class AppRuntimeEnvironment {
         do {
             return try AppModelContainerFactory.make()
         } catch {
+            // SwiftData 容器是应用启动的硬依赖，初始化失败时尽早暴露配置或迁移问题。
             fatalError("Failed to create SwiftData model container: \(error)")
         }
     }
 }
 
+/// UI 测试和预览使用的账号服务，保持接口行为完整，但不触碰真实网络和钥匙串。
 private actor MockAccountService: AccountServicing {
     private var session: AccountSession?
 

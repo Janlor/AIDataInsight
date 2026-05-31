@@ -1,19 +1,23 @@
+/// 历史明细的角色类型：问题或回答。
 public enum HistoryDetailTypeContract: String, Codable, Sendable {
     case question = "1"
     case answer = "2"
 }
 
+/// 历史回答内容类型：纯 AI 文本或图表 JSON。
 public enum HistoryContentTypeContract: String, Codable, Sendable {
     case ai = "1"
     case chart = "2"
 }
 
+/// 历史列表按时间归档后的分区类型。
 public enum HistorySectionKindContract: String, Codable, CaseIterable, Sendable {
     case today
     case thisMonth
     case other
 }
 
+/// 单条历史对话明细，后端以 type/contentType 区分问题、文本回答和图表回答。
 public struct HistoryDetailContract: Codable, Equatable, Sendable {
     public let id: Int?
     public let historyId: Int?
@@ -49,6 +53,7 @@ public struct HistoryDetailContract: Codable, Equatable, Sendable {
     }
 }
 
+/// 一次历史会话记录，包含会话元信息和可选的明细列表。
 public struct HistoryRecordContract: Codable, Equatable, Sendable {
     public let id: Int?
     public let name: String?
@@ -87,6 +92,7 @@ public struct HistoryRecordContract: Codable, Equatable, Sendable {
     }
 }
 
+/// 历史分页接口返回的页信息。
 public struct RecordPageContract: Codable, Equatable, Sendable {
     public let currentPage: Int?
     public let pageSize: Int?

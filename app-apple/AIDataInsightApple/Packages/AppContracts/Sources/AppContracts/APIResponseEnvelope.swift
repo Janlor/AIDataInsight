@@ -1,3 +1,4 @@
+/// 后端统一响应信封，业务数据位于 data，trace/tid 用于链路排查。
 public struct APIResponseEnvelope<Payload: Decodable & Sendable>: Decodable, Sendable {
     public let code: Int
     public let msg: String

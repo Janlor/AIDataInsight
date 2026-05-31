@@ -1,3 +1,4 @@
+/// 设置页展示的账号资料。
 public struct SettingAccountInfoContract: Codable, Equatable, Sendable {
     public let nickname: String?
     public let username: String?
@@ -10,6 +11,7 @@ public struct SettingAccountInfoContract: Codable, Equatable, Sendable {
     }
 }
 
+/// 设置页能力开关，决定哪些入口或操作可展示。
 public struct SettingCapabilityContract: Codable, Equatable, Sendable {
     public let canUpdatePassword: Bool
     public let canOpenPrivacy: Bool
@@ -22,6 +24,7 @@ public struct SettingCapabilityContract: Codable, Equatable, Sendable {
     }
 }
 
+/// 设置页快照，聚合账号资料、能力开关和版本号。
 public struct SettingSnapshotContract: Codable, Equatable, Sendable {
     public let accountInfo: SettingAccountInfoContract
     public let capability: SettingCapabilityContract
@@ -34,6 +37,7 @@ public struct SettingSnapshotContract: Codable, Equatable, Sendable {
     }
 }
 
+/// 隐私政策的一个段落。
 public struct PrivacyPolicySectionContract: Codable, Equatable, Sendable {
     public let heading: String
     public let paragraphs: [String]
@@ -44,6 +48,7 @@ public struct PrivacyPolicySectionContract: Codable, Equatable, Sendable {
     }
 }
 
+/// 隐私政策完整内容。
 public struct PrivacyPolicyContract: Codable, Equatable, Sendable {
     public let title: String
     public let updatedAt: String

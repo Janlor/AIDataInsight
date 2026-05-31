@@ -1,3 +1,4 @@
+/// 图表配色 token，order 决定多系列图表的取色顺序。
 public enum AppChartPalette {
     public static let order = ["blue", "cyan", "mint", "green", "purple", "orange", "coral"]
 

@@ -50,12 +50,14 @@ struct RootView: View {
         .modelContainer(environment.modelContainer)
         .desktopContentSize()
         .task {
+            // 启动后先恢复本地登录态，避免在登录页和主界面之间闪烁。
             await environment.loginStore.resolveLaunchSession()
         }
         .task(id: environment.loginStore.state.isAuthenticated) {
             guard environment.loginStore.state.isAuthenticated else {
                 return
             }
+            // 认证成功后再加载受保护数据，避免未登录时触发后端 401。
             await environment.settingStore.load()
             await environment.historyStore.loadFirstPage()
         }
@@ -63,6 +65,7 @@ struct RootView: View {
             guard isSending == false, environment.chatStore.state.activeHistoryID != nil else {
                 return
             }
+            // 发送完成后刷新历史首页，让新会话或标题变化尽快反映到侧边栏。
             Task {
                 await environment.historyStore.loadFirstPage()
             }
@@ -180,6 +183,7 @@ struct RootView: View {
             let drawerWidth = min(proxy.size.width * 0.86, 360)
             let dragX = compactHistoryDragX(drawerWidth: drawerWidth)
 
+            // 紧凑尺寸下用自定义抽屉承载历史列表，保留聊天页的完整导航栈。
             ZStack(alignment: .leading) {
                 NavigationStack {
                     AIChatScreen(store: environment.chatStore, account: accountDisplay)
@@ -276,6 +280,7 @@ struct RootView: View {
         DragGesture(minimumDistance: 12, coordinateSpace: .local)
             .onChanged { value in
                 if historyDragStartProgress == nil {
+                    // 只接管横向手势，避免和聊天内容的纵向滚动互相抢占。
                     guard isHorizontalHistoryDrag(value.translation),
                           historyDrawerProgress > 0 || value.translation.width > 0
                     else {
@@ -325,6 +330,7 @@ struct RootView: View {
     }
 
     private var canStartNewChat: Bool {
+        // 空白欢迎态不需要“新建会话”；已有草稿、消息或历史上下文时才启用。
         environment.chatStore.state.activeHistoryID != nil
         || environment.chatStore.state.messages.isEmpty == false
         || environment.chatStore.state.draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
@@ -350,6 +356,7 @@ struct RootView: View {
         guard reason != .logout, environment.loginStore.state.isAuthenticated else {
             return
         }
+        // token 失效来自网络层通知，根视图统一清理受保护状态并回到登录流程。
         environment.loginStore.markLoggedOut()
         clearProtectedStateForLogin()
     }

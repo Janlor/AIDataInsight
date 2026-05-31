@@ -1,9 +1,11 @@
 import Foundation
 
+/// 测试夹具加载错误。
 public enum FixtureLoaderError: Error, Equatable, Sendable {
     case missingFixture(String)
 }
 
+/// 从指定根目录读取测试夹具，并提供 JSON 解码便捷方法。
 public struct FixtureLoader: Sendable {
     public let rootURL: URL
 
@@ -24,6 +26,7 @@ public struct FixtureLoader: Sendable {
     }
 }
 
+/// 共享测试夹具路径，集中维护以避免各测试里散落字符串。
 public enum ContractFixturePath {
     public static let loginSnakeCaseResponse = "api/login-response-snake-case.json"
     public static let response401 = "api/response-401.json"

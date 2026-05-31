@@ -2,6 +2,7 @@ import AppContracts
 import Foundation
 import SwiftData
 
+/// 用户偏好记录，仅保存非敏感、小体量的本地设置。
 public struct UserPreferenceRecord: Equatable, Sendable {
     public let key: String
     public var value: String
@@ -14,11 +15,13 @@ public struct UserPreferenceRecord: Equatable, Sendable {
     }
 }
 
+/// 持久化边界说明：敏感会话进 Keychain，普通缓存进 SwiftData。
 public enum PersistenceBoundary {
     public static let sensitiveSessionStorage = "Keychain"
     public static let nonSensitiveCacheStorage = "SwiftData"
 }
 
+/// SwiftData schema 入口，集中声明当前 App 使用的模型集合。
 public enum AppPersistenceSchema {
     public static let version = "0.1.0"
 
@@ -32,6 +35,7 @@ public enum AppPersistenceSchema {
     }
 }
 
+/// ModelContainer 工厂，生产环境和测试环境通过参数选择磁盘或内存存储。
 public enum AppModelContainerFactory {
     public static func make(isStoredInMemoryOnly: Bool = false) throws -> ModelContainer {
         let configuration = ModelConfiguration(
@@ -49,6 +53,7 @@ public enum AppModelContainerFactory {
     }
 }
 
+/// 历史会话缓存模型，和明细模型使用级联删除关系。
 @Model
 public final class CachedHistoryRecordModel {
     @Attribute(.unique) public var cacheID: String
@@ -73,6 +78,7 @@ public final class CachedHistoryRecordModel {
     }
 }
 
+/// 历史明细缓存模型，保留原始枚举值以降低本地 schema 迁移成本。
 @Model
 public final class CachedHistoryDetailModel {
     @Attribute(.unique) public var cacheID: String
@@ -106,6 +112,7 @@ public final class CachedHistoryDetailModel {
     }
 }
 
+/// 推荐问题缓存模型，问题数组以 JSON payload 保存，避免为简单列表建子表。
 @Model
 public final class CachedTemplateQuestionSetModel {
     @Attribute(.unique) public var cacheKey: String
@@ -119,6 +126,7 @@ public final class CachedTemplateQuestionSetModel {
     }
 }
 
+/// 用户偏好 SwiftData 模型。
 @Model
 public final class UserPreferenceModel {
     @Attribute(.unique) public var key: String
@@ -132,6 +140,7 @@ public final class UserPreferenceModel {
     }
 }
 
+/// 历史缓存仓库协议，供未来离线或启动缓存读取复用。
 @MainActor
 public protocol HistoryCacheRepository {
     func replaceAll(with records: [HistoryRecordContract]) throws
@@ -140,6 +149,7 @@ public protocol HistoryCacheRepository {
     func clear() throws
 }
 
+/// 基于 SwiftData 的历史缓存仓库实现。
 @MainActor
 public final class SwiftDataHistoryCacheRepository: HistoryCacheRepository {
     private let context: ModelContext
@@ -165,6 +175,7 @@ public final class SwiftDataHistoryCacheRepository: HistoryCacheRepository {
         return try context.fetch(descriptor).map { record in
             var details = record.details
             if let remoteID = record.remoteID {
+                // 显式按 sortIndex 取明细，避免 SwiftData relationship 的默认顺序影响聊天回放。
                 let detailDescriptor = FetchDescriptor<CachedHistoryDetailModel>(
                     predicate: #Predicate { detail in
                         detail.historyID == remoteID
@@ -196,6 +207,7 @@ public final class SwiftDataHistoryCacheRepository: HistoryCacheRepository {
     }
 }
 
+/// 推荐问题缓存仓库协议。
 @MainActor
 public protocol TemplateQuestionCacheRepository {
     func save(_ questionSet: TemplateQuestionSetContract, cacheKey: String) throws
@@ -203,6 +215,7 @@ public protocol TemplateQuestionCacheRepository {
     func clear(cacheKey: String) throws
 }
 
+/// 基于 SwiftData 的推荐问题缓存仓库实现。
 @MainActor
 public final class SwiftDataTemplateQuestionCacheRepository: TemplateQuestionCacheRepository {
     private let context: ModelContext
@@ -248,6 +261,7 @@ public final class SwiftDataTemplateQuestionCacheRepository: TemplateQuestionCac
     }
 }
 
+/// 用户偏好仓库协议。
 @MainActor
 public protocol UserPreferenceRepository {
     func save(_ record: UserPreferenceRecord) throws
@@ -255,6 +269,7 @@ public protocol UserPreferenceRepository {
     func delete(key: String) throws
 }
 
+/// 基于 SwiftData 的用户偏好仓库实现。
 @MainActor
 public final class SwiftDataUserPreferenceRepository: UserPreferenceRepository {
     private let context: ModelContext
@@ -296,6 +311,7 @@ public final class SwiftDataUserPreferenceRepository: UserPreferenceRepository {
 }
 
 private extension CachedHistoryRecordModel {
+    /// 在契约模型和缓存模型之间转换，cacheID 优先使用远端 id，缺失时生成本地 id。
     convenience init(contract: HistoryRecordContract) {
         let remoteID = contract.id
         let detailModels = (contract.detailList ?? []).enumerated().map { index, detail in
@@ -327,6 +343,7 @@ private extension CachedHistoryRecordModel {
 }
 
 private extension CachedHistoryDetailModel {
+    /// 保存明细在原会话中的顺序，用于恢复聊天列表时稳定排序。
     convenience init(contract: HistoryDetailContract, sortIndex: Int) {
         let remoteID = contract.id
         self.init(

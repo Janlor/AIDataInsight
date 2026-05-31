@@ -6,6 +6,7 @@ import Foundation
 import Observation
 import SwiftUI
 
+/// 历史侧边栏中的单条会话。
 public struct HistoryConversationViewState: Identifiable, Equatable, Sendable {
     public let id: String
     public let remoteID: Int?
@@ -22,6 +23,7 @@ public struct HistoryConversationViewState: Identifiable, Equatable, Sendable {
     }
 }
 
+/// 按时间分组后的历史会话集合。
 public struct HistoryGroupViewState: Identifiable, Equatable, Sendable {
     public let id: HistorySectionKindContract
     public let title: String
@@ -34,6 +36,7 @@ public struct HistoryGroupViewState: Identifiable, Equatable, Sendable {
     }
 }
 
+/// 历史模块整体状态，包含分页、选择态和删除中的临时状态。
 public struct HistoryViewState: Equatable, Sendable {
     public var groups: [HistoryGroupViewState]
     public var selectedID: Int?
@@ -65,12 +68,14 @@ public struct HistoryViewState: Equatable, Sendable {
     }
 }
 
+/// 历史记录仓库协议，隔离真实接口和预览数据。
 public protocol HistoryRepository: Sendable {
     func loadHistoryPage(currentPage: Int, pageSize: Int) async throws -> RecordPageContract
     func deleteHistory(historyId: Int) async throws
     func deleteAllHistory() async throws
 }
 
+/// 真实后端历史仓库。
 public struct RemoteHistoryRepository: HistoryRepository {
     private let client: HTTPClient
 
@@ -104,6 +109,7 @@ public struct RemoteHistoryRepository: HistoryRepository {
     }
 }
 
+/// 历史列表状态机，负责分页加载、选择会话和删除记录后的本地同步。
 @MainActor
 @Observable
 public final class HistoryStore {
@@ -144,6 +150,7 @@ public final class HistoryStore {
         guard state.hasMore, state.isLoading == false else {
             return
         }
+        // 只有滚动到当前最后一条时才触发下一页，避免列表刷新过程中重复请求。
         guard currentItemID == conversations.last?.id else {
             return
         }
@@ -217,6 +224,7 @@ public final class HistoryStore {
         do {
             let pageResult = try await repository.loadHistoryPage(currentPage: page, pageSize: state.pageSize)
             let incoming = pageResult.records ?? []
+            // 首屏刷新替换缓存，翻页则追加；随后统一重新分组，保证分区顺序稳定。
             records = replacing ? incoming : records + incoming
             state.currentPage = pageResult.currentPage ?? page
             state.pageSize = pageResult.pageSize ?? state.pageSize
@@ -282,6 +290,7 @@ public final class HistoryStore {
     }
 }
 
+/// 会话历史侧边栏，桌面端直接放在 SplitView，紧凑端放入抽屉。
 public struct HistorySidebar: View {
     @Bindable private var store: HistoryStore
     @State private var hoveredConversationID: Int?
@@ -538,6 +547,7 @@ public struct HistorySidebar: View {
 }
 
 private enum DateParser {
+    /// 兼容后端可能返回的 ISO8601 或普通日期时间字符串。
     static func parse(_ string: String?) -> Date? {
         guard let string, string.isEmpty == false else {
             return nil
@@ -570,6 +580,7 @@ private extension HistorySectionKindContract {
     }
 }
 
+/// 本地预览历史仓库，用于 UI 测试和 Xcode 预览。
 public struct PreviewHistoryRepository: HistoryRepository {
     public init() {}
 

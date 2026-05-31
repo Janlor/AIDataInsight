@@ -5,6 +5,7 @@ import UIKit
 import AppKit
 #endif
 
+/// 设计系统颜色 token，同时记录亮色、暗色和高层级暗色背景取值。
 public struct AppColorToken: Equatable, Sendable {
     public let lightHex: String
     public let darkHex: String
@@ -25,6 +26,7 @@ public struct AppColorToken: Equatable, Sendable {
     }
 }
 
+/// App 级颜色语义命名，业务界面应优先使用这些 token 而不是散落 hex 值。
 public enum AppColor {
     public enum Accent {
         public static let primary = AppColorToken(lightHex: "#2F7BFF", darkHex: "#4C8DFF", elevatedHex: "#5A97FF")
@@ -61,6 +63,7 @@ public enum AppColor {
 }
 
 public extension Color {
+    /// 支持 #RRGGBB 和 #AARRGGBB 的十六进制颜色初始化。
     init(hex: String) {
         let trimmed = hex.trimmingCharacters(in: CharacterSet(charactersIn: "#"))
         var value: UInt64 = 0
@@ -89,6 +92,7 @@ public extension Color {
 }
 
 private extension Color {
+    /// 根据当前平台的外观模式动态切换亮色/暗色颜色。
     init(light: Color, dark: Color) {
 #if os(macOS)
         self.init(nsColor: NSColor(name: nil) { appearance in

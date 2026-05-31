@@ -1,5 +1,6 @@
 import Foundation
 
+/// 推荐问题接口返回的模板问题集合。
 public struct TemplateQuestionSetContract: Codable, Equatable, Sendable {
     public let questions: [String]
 
@@ -8,6 +9,7 @@ public struct TemplateQuestionSetContract: Codable, Equatable, Sendable {
     }
 }
 
+/// 基础查询参数，覆盖应收账款等只需要组织、客户、订单类型和数值条件的函数。
 public struct BasicQueryContract: Codable, Equatable, Sendable {
     public let orgId: Int?
     public let customerName: String?
@@ -24,6 +26,7 @@ public struct BasicQueryContract: Codable, Equatable, Sendable {
     }
 }
 
+/// 带时间范围的查询参数，覆盖销售、采购等按时间统计的函数。
 public struct TimeRangeQueryContract: Codable, Equatable, Sendable {
     public let startDate: String?
     public let endDate: String?
@@ -46,6 +49,7 @@ public struct TimeRangeQueryContract: Codable, Equatable, Sendable {
     }
 }
 
+/// 仓库维度查询参数，覆盖库存、入库、采购等仓库相关函数。
 public struct WarehouseQueryContract: Codable, Equatable, Sendable {
     public let orgId: Int?
     public let warehouseName: String?
@@ -64,6 +68,7 @@ public struct WarehouseQueryContract: Codable, Equatable, Sendable {
     }
 }
 
+/// 账龄查询参数，valueArray 承载后端定义的账龄区间。
 public struct AccountAgeQueryContract: Codable, Equatable, Sendable {
     public let orgId: Int?
     public let customerName: String?
@@ -78,6 +83,7 @@ public struct AccountAgeQueryContract: Codable, Equatable, Sendable {
     }
 }
 
+/// 经营指标类型查询参数。
 public struct PerformanceTypeQueryContract: Codable, Equatable, Sendable {
     public let indexType: String?
 
@@ -86,6 +92,7 @@ public struct PerformanceTypeQueryContract: Codable, Equatable, Sendable {
     }
 }
 
+/// 函数调用参数的联合类型，用函数名推断具体参数结构。
 public enum FunctionArgumentsContract: Codable, Equatable, Sendable {
     case basic(BasicQueryContract)
     case timeRange(TimeRangeQueryContract)
@@ -119,6 +126,7 @@ public enum FunctionArgumentsContract: Codable, Equatable, Sendable {
     public static func decode(from decoder: Decoder, name: FunctionNameContract?) throws -> FunctionArgumentsContract {
         let container = try decoder.singleValueContainer()
         if let string = try? container.decode(String.self) {
+            // 后端有时把 arguments 作为 JSON 字符串返回，这里按函数名再解一次。
             guard let data = string.data(using: .utf8), let kind = name?.argumentKind else {
                 throw DecodingError.dataCorruptedError(
                     in: container,
@@ -212,6 +220,7 @@ public enum FunctionArgumentsContract: Codable, Equatable, Sendable {
     }
 }
 
+/// 后端支持的分析函数名，也是图表接口路径的一部分。
 public enum FunctionNameContract: String, Codable, CaseIterable, Sendable {
     case queryArGroupByOrg
     case queryArGroupByCustomer
@@ -233,6 +242,7 @@ public enum FunctionNameContract: String, Codable, CaseIterable, Sendable {
     case queryPerformanceType
 
     public var argumentKind: FunctionArgumentsContract.Kind {
+        // 不同函数复用少数几类参数结构，集中维护映射，避免仓库层分散判断。
         switch self {
         case .queryArGroupByOrg, .queryArGroupByCustomer, .queryAccountGroupByAge:
             return .basic
@@ -250,6 +260,7 @@ public enum FunctionNameContract: String, Codable, CaseIterable, Sendable {
     }
 }
 
+/// 通用单值图表数据项。
 public struct ChartCommonItemContract: Codable, Equatable, Sendable {
     public let bizId: String?
     public let name: String?
@@ -262,6 +273,7 @@ public struct ChartCommonItemContract: Codable, Equatable, Sendable {
     }
 }
 
+/// 账龄分组图表数据项，可包含多条标签和值。
 public struct AccountAgeGroupItemContract: Codable, Equatable, Sendable {
     public let name: String?
     public let valueList: [Double]?
@@ -278,6 +290,7 @@ public struct AccountAgeGroupItemContract: Codable, Equatable, Sendable {
     }
 }
 
+/// 历史图表详情，兼容普通图表和账龄图表两种数据结构。
 public struct HistoryChartDetailContract: Codable, Equatable, Sendable {
     public let historyDetailId: Int?
     public let funcType: FunctionNameContract?
@@ -292,6 +305,7 @@ public struct HistoryChartDetailContract: Codable, Equatable, Sendable {
     }
 }
 
+/// 函数识别接口返回的模型，描述是否需要工具调用以及后续图表查询参数。
 public struct FunctionModelContract: Codable, Equatable, Sendable {
     public let historyId: Int?
     public let hasTool: Bool?
@@ -328,6 +342,7 @@ public struct FunctionModelContract: Codable, Equatable, Sendable {
             hasArguments = false
         }
         if hasArguments {
+            // arguments 的真实结构依赖 name，需要自定义解码才能保持强类型。
             arguments = try FunctionArgumentsContract.decode(
                 from: container.superDecoder(forKey: .arguments),
                 name: name
@@ -347,6 +362,7 @@ public struct FunctionModelContract: Codable, Equatable, Sendable {
     }
 }
 
+/// 历史详情点赞/点踩请求。
 public struct LikeHistoryDetailRequestContract: Codable, Equatable, Sendable {
     public let historyDetailId: Int
     public let like: String

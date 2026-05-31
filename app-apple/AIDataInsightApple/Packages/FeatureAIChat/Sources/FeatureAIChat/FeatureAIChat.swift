@@ -7,11 +7,13 @@ import Foundation
 import Observation
 import SwiftUI
 
+/// 助手需要用户补充的意图类型，目前用于时间范围和指标类型选择。
 public enum AIChatIntentType: String, Equatable, Sendable {
     case time
     case index
 }
 
+/// 聊天消息在界面上的展示形态。
 public enum ChatMessageContentKind: Equatable, Sendable {
     case text
     case chart
@@ -19,6 +21,7 @@ public enum ChatMessageContentKind: Equatable, Sendable {
     case welcome
 }
 
+/// 单条回答的反馈状态，对应点赞、点踩和服务端未知值。
 public enum FeedbackState: Equatable, Sendable {
     case liked
     case disliked
@@ -26,11 +29,13 @@ public enum FeedbackState: Equatable, Sendable {
     case unknown
 }
 
+/// 图表数值单位，影响轴标签和 tooltip 的格式化。
 public enum ChartUnit: Equatable, Sendable {
     case currency
     case ton
 }
 
+/// 一组可绘制的图表序列，xAxis 表示当前分组名，labels/values 保持同下标对应。
 public struct ChartSeriesViewState: Identifiable, Equatable, Sendable {
     public let id: String
     public let xAxis: String
@@ -45,6 +50,7 @@ public struct ChartSeriesViewState: Identifiable, Equatable, Sendable {
     }
 }
 
+/// 图表消息的视图载荷，把后端图表明细整理成 UI 可直接消费的序列。
 public struct ChartPayloadViewState: Equatable, Sendable {
     public let functionName: FunctionNameContract?
     public let unit: ChartUnit
@@ -60,6 +66,7 @@ public struct ChartPayloadViewState: Equatable, Sendable {
 
     public init(detail: HistoryChartDetailContract, fallbackName: FunctionNameContract? = nil) {
         if let first = detail.accountAgeGroupVoList?.first, first.chartType == "2", let msg = first.msg {
+            // 账龄接口用 chartType == "2" 表示无图表但有说明文案，UI 按普通文本提示展示。
             self.init(functionName: detail.funcType ?? fallbackName, unit: .currency, series: [], emptyMessage: msg)
             return
         }
@@ -79,6 +86,7 @@ public struct ChartPayloadViewState: Equatable, Sendable {
     }
 }
 
+/// 聊天页的单条消息状态，兼容普通文本、意图补充和图表回答。
 public struct ChatMessageViewState: Identifiable, Equatable, Sendable {
     public enum Role: Equatable, Sendable {
         case user
@@ -118,6 +126,7 @@ public struct ChatMessageViewState: Identifiable, Equatable, Sendable {
     }
 }
 
+/// 聊天页整体状态，Store 只通过该结构暴露可观察数据。
 public struct AIChatViewState: Equatable, Sendable {
     public var messages: [ChatMessageViewState]
     public var draft: String
@@ -161,6 +170,7 @@ public struct AIChatViewState: Equatable, Sendable {
     }
 }
 
+/// AI 问答领域仓库协议，隐藏模板、历史、函数调用、图表和反馈的具体来源。
 public protocol AIChatRepository: Sendable {
     func loadTemplate() async throws -> TemplateQuestionSetContract
     func loadHistoryDetail(historyId: Int) async throws -> HistoryRecordContract
@@ -170,6 +180,7 @@ public protocol AIChatRepository: Sendable {
     func streamMessage(text: String) -> AsyncThrowingStream<String, Error>
 }
 
+/// 真实后端仓库实现，负责把 UI 操作翻译成对应接口请求。
 public struct RemoteAIChatRepository: AIChatRepository {
     private let client: HTTPClient
     private let streamer: SSEStreaming?
@@ -254,6 +265,7 @@ public struct RemoteAIChatRepository: AIChatRepository {
     }
 }
 
+/// 聊天状态机，串联“用户问题 -> 函数识别 -> 参数补全 -> 图表数据 -> 回答展示”的流程。
 @MainActor
 @Observable
 public final class AIChatStore {
@@ -331,6 +343,7 @@ public final class AIChatStore {
             state.activeHistoryID = function.historyId ?? state.activeHistoryID
             try await handle(function: function)
         } catch {
+            // 模板问题是结构化入口，失败时直接给兜底文案；自由输入可尝试 SSE 文本流回退。
             if allowStreamFallback {
                 await streamFallbackResponse(for: text)
             } else {
@@ -386,11 +399,13 @@ public final class AIChatStore {
         }
 
         if case .timeRange(let value) = arguments, value.startDate == nil {
+            // 后端识别出时间类问题但缺少时间范围时，先让用户补充参数，不直接请求图表。
             appendAssistantIntent(text: function.msg ?? "请选择时间范围", intentType: .time)
             return
         }
 
         if case .performanceType = arguments {
+            // 经营指标类问题需要用户选择指标口径，再继续后续分析。
             appendAssistantIntent(text: function.msg ?? "请选择指标类型", intentType: .index)
             return
         }
@@ -440,6 +455,7 @@ public final class AIChatStore {
     }
 }
 
+/// 聊天主界面，包含消息列表、欢迎态、模板问题和底部输入区。
 public struct AIChatScreen: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @FocusState private var isComposerFocused: Bool
@@ -967,6 +983,7 @@ private struct TemplateQuestionPayload: Decodable, Sendable {
 }
 
 private extension ChatMessageViewState {
+    /// 将历史详情转换成当前消息模型，保留后端点赞状态和图表标记。
     init(contract: HistoryDetailContract) {
         let role: Role = contract.type == .question ? .user : .assistant
         let contentKind: ChatMessageContentKind = contract.contentType == .chart ? .chart : .text
@@ -993,6 +1010,7 @@ private extension ChatMessageViewState {
 }
 
 private extension HistoryDetailContract {
+    /// 历史图表内容里目前保存的是可解码的图表详情 JSON。
     var chartDetail: HistoryChartDetailContract? {
         guard contentType == .chart, let content, let data = content.data(using: .utf8) else {
             return nil
@@ -1025,6 +1043,7 @@ private extension FeedbackState {
 }
 
 private extension FunctionNameContract {
+    /// 库存类接口以吨为单位，其余经营分析默认按金额展示。
     var usesTon: Bool {
         self == .queryStockGroupByOrg || self == .queryStockGroupByWarehouse
     }
@@ -1121,6 +1140,7 @@ private extension AppChartPalette {
 }
 
 private extension FunctionArgumentsContract {
+    /// 将不同函数参数统一转换为 queryItems，供图表接口复用。
     var queryItems: [HTTPQueryItem] {
         switch self {
         case .basic(let value):
@@ -1199,6 +1219,7 @@ private extension Array where Element == HTTPQueryItem {
     }
 }
 
+/// 本地预览和测试仓库，模拟模板、函数识别、图表和流式回答。
 public struct PreviewAIChatRepository: AIChatRepository {
     public init() {}
 

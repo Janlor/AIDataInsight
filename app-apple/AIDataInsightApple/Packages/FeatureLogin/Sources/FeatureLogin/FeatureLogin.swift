@@ -5,6 +5,7 @@ import AppDesignSystem
 import Observation
 import SwiftUI
 
+/// 登录页状态，包含表单输入、隐私协议勾选、启动态恢复和鉴权结果。
 public struct LoginViewState: Equatable, Sendable {
     public var account: String
     public var password: String
@@ -33,6 +34,7 @@ public struct LoginViewState: Equatable, Sendable {
     }
 }
 
+/// 登录状态机，封装启动态恢复、登录提交和退出登录。
 @MainActor
 @Observable
 public final class LoginStore {
@@ -66,6 +68,7 @@ public final class LoginStore {
         guard state.hasResolvedLaunchSession == false else {
             return
         }
+        // 该方法只在启动阶段执行一次，完成后 UI 才能判断展示登录页还是主界面。
         defer { state.hasResolvedLaunchSession = true }
         do {
             state.isAuthenticated = try await accountService.resolveLaunchSession()?.isLogin == true
@@ -118,6 +121,7 @@ public final class LoginStore {
     }
 }
 
+/// 登录界面，负责账号密码输入、隐私协议入口和响应式布局。
 public struct LoginScreen: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Bindable private var store: LoginStore
